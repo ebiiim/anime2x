@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -48,9 +49,9 @@ def ssim_hist_gen(target: pd.Series, bins=10, min_ssim=0.0, max_ssim=1.0, cumula
 
 def load_similarity_csv(similarity_csv) -> pd.DataFrame:
     df = pd.read_csv(similarity_csv, index_col=0)
-    print(df.head(3))
-    print(df.info())
-    print(df.describe())
+    logger.debug(df.head(3))
+    logger.debug(df.info())
+    logger.debug(df.describe())
     return df
 
 
@@ -64,12 +65,12 @@ def get_copy_lists(df: pd.DataFrame, target: pd.Series, ssim_threshold):
     col_filename = 'FileName'
     copy_index_list = df[target >= ssim_threshold].index
 
-    logger.debug('ssim_threshold: ' + str(ssim_threshold))
+    logger.info('ssim_threshold: ' + str(ssim_threshold))
     lo = len(df)
     lc = len(copy_index_list)
-    logger.debug('length_original: ' + str(lo))
-    logger.debug('length_copy: ' + str(lc))
-    logger.debug('rate: ' + str(lc/lo))
+    logger.info('length_original: ' + str(lo))
+    logger.info('length_copy: ' + str(lc))
+    logger.info('rate: ' + str(lc/lo))
 
     src_list = list()
     del_list = list()
@@ -82,25 +83,25 @@ def get_copy_lists(df: pd.DataFrame, target: pd.Series, ssim_threshold):
 
 def copy_dedup(del_list):
     """
-    input/のファイルをdel_listを除きすべてoutput/にコピーする。
+    input/のファイルをdel_listを除きすべてtmp/にコピーする。
     """
     input_list = ['.' + DIR_INPUT + '/' + each for each in os.listdir(PATH_INPUT)]
     dedup_list = list(set(input_list) - set(del_list))
     print(dedup_list)
     for file in dedup_list:
         copy_src = file
-        copy_dst = PATH_OUTPUT + '/' + file.split('/')[-1]
+        copy_dst = PATH_TMP + '/' + file.split('/')[-1]
         shutil.copy2(copy_src, copy_dst)
         logger.debug('copy: ' + copy_src + ' -> ' + copy_dst)
 
 
 def copy_dup(dup_list, src_list):
     """
-    input/のsrc_listに記載のファイルをdup_listに記載の名前でoutput/にコピーする。
+    input/のsrc_listに記載のファイルをdup_listに記載の名前でtmp/にコピーする。
     """
     for (dup, src) in zip(dup_list, src_list):
         copy_src = src
-        copy_dst = PATH_OUTPUT + '/' + dup.split('/')[-1]
+        copy_dst = PATH_TMP + '/' + dup.split('/')[-1]
         shutil.copy2(copy_src, copy_dst)
         logger.debug('copy: ' + copy_src + ' -> ' + copy_dst)
 
@@ -117,11 +118,13 @@ if __name__ == '__main__':
         print('Usage: run.py MODE [SSIM_THRESHOLD] SIMILARITY_CSV_FILE\n'
               '\tMODE hist: Generate a histogram\n'
               '\tMODE check: Check duplicate images\n'
-              '\tMODE copy: Copy images\n'
-              '\tMODE enc: Encode images to a mp4 file\n'
+              '\tMODE copy1: Copy de-duplicated images to /tmp\n'
+              '\tMODE copy2: Copy filtered images to /tmp\n'
+              '\tMODE enc: Encode images in /tmp to a mp4 file\n'
               'Example: run.py hist ./similarity.csv\n'
               'Example: run.py check 0.85 ./similarity.csv\n'
-              'Example: run.py copy 0.85 ./similarity.csv\n'
+              'Example: run.py copy1 0.85 ./similarity.csv\n'
+              'Example: run.py copy2 0.85 ./similarity.csv\n'
               'Example: run.py enc ./similarity.csv\n'
               )
         sys.exit(0)
@@ -132,14 +135,45 @@ if __name__ == '__main__':
 
     if sys.argv[1] == 'check':
         data = load_similarity_csv(sys.argv[3])
-        del_l, src_l = get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
-        print(del_l)
+        get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
 
-    if sys.argv[1] == 'copy':
+    if sys.argv[1] == 'copy1':
         data = load_similarity_csv(sys.argv[3])
         del_l, src_l = get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
         copy_dedup(del_l)
+
+    if sys.argv[1] == 'copy2':
+        data = load_similarity_csv(sys.argv[3])
+        del_l, src_l = get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
         copy_dup(del_l, src_l)
 
     if sys.argv[1] == 'enc':
-        pass
+        # TODO: ffmpegのオプションを変更可能にする。現在は固定なのでファイル名など注意。
+        encode_mp4 = [PATH_FFMPEG,
+                      '-r 24',
+                      '-i ' + PATH_TMP + '/image_%8d.png',
+                      '-vcodec libx265 -preset fast -tune ssim -crf 22',
+                      PATH_OUTPUT + '/tmp.mp4',
+                      ]
+
+        add_sound = [PATH_FFMPEG,
+                     '-i ' + PATH_OUTPUT + '/tmp.mp4',
+                     '-i ' + PATH_OUTPUT + '/audio.aac',  # XXX: audio.aacをPATH_OUTPUTに置いてください！
+                     '-vcodec copy',
+                     '-acodec copy',
+                     PATH_OUTPUT + '/' + datetime.datetime.now().strftime('%Y%m%d%H%M%SZ') + '.mp4'
+                     ]
+
+        # logging
+        stdout = subprocess.DEVNULL
+        if logger.getEffectiveLevel() == 10:  # DEBUG
+            stdout = None
+
+        # run cmd
+        logger.debug(' '.join(encode_mp4))
+        subprocess.run(' '.join(encode_mp4), stdout=stdout)
+
+        logger.debug(' '.join(add_sound))
+        subprocess.run(' '.join(add_sound), stdout=stdout)
+
+        os.remove(PATH_OUTPUT + '/tmp.mp4')
