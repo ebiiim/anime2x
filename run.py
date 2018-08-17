@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -9,7 +10,8 @@ logger = getLogger(__name__)
 
 PATH_SELF = os.path.dirname(os.path.abspath(__file__))
 PATH_TMP = PATH_SELF + '/tmp'
-PATH_INPUT = PATH_SELF + '/input'
+DIR_INPUT = '/input'
+PATH_INPUT = PATH_SELF + DIR_INPUT
 PATH_OUTPUT = PATH_SELF + '/output'
 PATH_BIN = PATH_SELF + '/bin'
 PATH_FFMPEG = PATH_BIN + '/ffmpeg.exe'
@@ -78,6 +80,31 @@ def get_copy_lists(df: pd.DataFrame, target: pd.Series, ssim_threshold):
     return list(del_list), list(src_list)
 
 
+def copy_dedup(del_list):
+    """
+    input/のファイルをdel_listを除きすべてoutput/にコピーする。
+    """
+    input_list = ['.' + DIR_INPUT + '/' + each for each in os.listdir(PATH_INPUT)]
+    dedup_list = list(set(input_list) - set(del_list))
+    print(dedup_list)
+    for file in dedup_list:
+        copy_src = file
+        copy_dst = PATH_OUTPUT + '/' + file.split('/')[-1]
+        shutil.copy2(copy_src, copy_dst)
+        logger.debug('copy: ' + copy_src + ' -> ' + copy_dst)
+
+
+def copy_dup(dup_list, src_list):
+    """
+    input/のsrc_listに記載のファイルをdup_listに記載の名前でoutput/にコピーする。
+    """
+    for (dup, src) in zip(dup_list, src_list):
+        copy_src = src
+        copy_dst = PATH_OUTPUT + '/' + dup.split('/')[-1]
+        shutil.copy2(copy_src, copy_dst)
+        logger.debug('copy: ' + copy_src + ' -> ' + copy_dst)
+
+
 if __name__ == '__main__':
     import logging
     LOG_LEVEL = logging.DEBUG
@@ -105,13 +132,14 @@ if __name__ == '__main__':
 
     if sys.argv[1] == 'check':
         data = load_similarity_csv(sys.argv[3])
-        src_l, del_l = get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
+        del_l, src_l = get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
         print(del_l)
 
     if sys.argv[1] == 'copy':
         data = load_similarity_csv(sys.argv[3])
-        src_l, del_l = get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
-        pass
+        del_l, src_l = get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
+        copy_dedup(del_l)
+        copy_dup(del_l, src_l)
 
     if sys.argv[1] == 'enc':
         pass
