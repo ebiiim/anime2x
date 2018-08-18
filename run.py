@@ -34,10 +34,10 @@ def init_check():
             sys.exit(1)
 
 
-def ssim_hist_gen(target: pd.Series, bins=10, min_ssim=0.0, max_ssim=1.0, cumulative=True):
+def ssim_hist_gen(df: pd.DataFrame, target_col_name, bins=10, min_ssim=0.0, max_ssim=1.0, cumulative=True):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    target.hist(ax=ax, bins=bins, range=[min_ssim, max_ssim], cumulative=cumulative)
+    df[target_col_name].hist(ax=ax, bins=bins, range=[min_ssim, max_ssim], cumulative=cumulative)
     ax.set_xlabel('SSIM')
     ax.set_ylabel('Freq.')
     ax.xaxis.set_major_formatter(plt.FormatStrFormatter('%.4g'))
@@ -55,7 +55,7 @@ def load_similarity_csv(similarity_csv) -> pd.DataFrame:
     return df
 
 
-def get_copy_lists(df: pd.DataFrame, target: pd.Series, ssim_threshold):
+def get_copy_lists(df: pd.DataFrame, target_col_name, ssim_threshold):
     """
     (src_list, del_list)を返す。
     del_listはSSIMしきい値以上のファイル名を格納したリスト。
@@ -63,8 +63,11 @@ def get_copy_lists(df: pd.DataFrame, target: pd.Series, ssim_threshold):
     利用方法: del_listのファイルを削除して、src_listのファイルをdel_listの同indexのファイル名で保存する。
     """
     col_filename = 'FileName'
-    copy_index_list = df[target >= ssim_threshold].index
 
+    # 重複フレームのindexを取得
+    copy_index_list = df[df[target_col_name] >= ssim_threshold].index
+
+    # 重複率の表示
     logger.info('ssim_threshold: ' + str(ssim_threshold))
     lo = len(df)
     lc = len(copy_index_list)
@@ -72,10 +75,17 @@ def get_copy_lists(df: pd.DataFrame, target: pd.Series, ssim_threshold):
     logger.info('length_copy: ' + str(lc))
     logger.info('rate: ' + str(lc/lo))
 
+    # コピー元ファイル名リストとコピー先ファイル名リストを作る
     src_list = list()
     del_list = list()
     for each in copy_index_list:
-        src_list.extend(list(df.query('index == ' + str(each - 1))[col_filename]))
+        # コピー元ファイル名リスト
+        for n in range(each - 1):  # range(each)だと1枚目まで見に行く、2枚目開始なのでrange(each - 1)
+            # n枚前が重複でない場合は採用（重複なら飛ばす）
+            if list(df.query('index == ' + str(each - n))[target_col_name])[0] < ssim_threshold:
+                src_list.extend(list(df.query('index == ' + str(each - n))[col_filename]))
+                break
+        # コピー先ファイル名リスト
         del_list.extend(list(df.query('index == ' + str(each))[col_filename]))
 
     return list(del_list), list(src_list)
@@ -83,7 +93,7 @@ def get_copy_lists(df: pd.DataFrame, target: pd.Series, ssim_threshold):
 
 def copy_dedup(del_list):
     """
-    input/のファイルをdel_listを除きすべてtmp/にコピーする。
+    input/のファイルをdel_listを除きすべてindex/からtmp/にコピーする。
     """
     input_list = ['.' + DIR_INPUT + '/' + each for each in os.listdir(PATH_INPUT)]
     dedup_list = list(set(input_list) - set(del_list))
@@ -97,10 +107,10 @@ def copy_dedup(del_list):
 
 def copy_dup(dup_list, src_list):
     """
-    input/のsrc_listに記載のファイルをdup_listに記載の名前でtmp/にコピーする。
+    input/のsrc_listに記載のファイルをdup_listに記載の名前でtmp/からtmp/にコピーする。
     """
     for (dup, src) in zip(dup_list, src_list):
-        copy_src = src
+        copy_src = PATH_TMP + '/' + src.split('/')[-1]
         copy_dst = PATH_TMP + '/' + dup.split('/')[-1]
         shutil.copy2(copy_src, copy_dst)
         logger.debug('copy: ' + copy_src + ' -> ' + copy_dst)
@@ -131,20 +141,20 @@ if __name__ == '__main__':
 
     if sys.argv[1] == 'hist':
         data = load_similarity_csv(sys.argv[2])
-        ssim_hist_gen(data['SSIM(Whole)'], bins=1000, min_ssim=0.90, cumulative=True)
+        ssim_hist_gen(data, 'SSIM(Whole)', bins=1000, min_ssim=0.90, cumulative=True)
 
     if sys.argv[1] == 'check':
         data = load_similarity_csv(sys.argv[3])
-        get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
+        get_copy_lists(data, 'SSIM(Whole)', float(sys.argv[2]))
 
     if sys.argv[1] == 'copy1':
         data = load_similarity_csv(sys.argv[3])
-        del_l, src_l = get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
+        del_l, src_l = get_copy_lists(data, 'SSIM(Whole)', float(sys.argv[2]))
         copy_dedup(del_l)
 
     if sys.argv[1] == 'copy2':
         data = load_similarity_csv(sys.argv[3])
-        del_l, src_l = get_copy_lists(data, data['SSIM(Whole)'], float(sys.argv[2]))
+        del_l, src_l = get_copy_lists(data, 'SSIM(Whole)', float(sys.argv[2]))
         copy_dup(del_l, src_l)
 
     if sys.argv[1] == 'enc':
