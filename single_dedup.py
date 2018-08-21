@@ -31,7 +31,7 @@ if __name__ == '__main__':
               )
         sys.exit(0)
 
-    ssim_col_name = 'SSIM(Whole)'
+    ssim_col_name = 'SSIM'
 
     if sys.argv[1] == 'hist':
         data = mdp.load_similarity_csv(sys.argv[2])
