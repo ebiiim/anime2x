@@ -14,8 +14,9 @@ class MovDivider(object):
         """
         divide_image()のためにディレクトリを作成する
         """
-        base_dir = '/'.join(src.split('/')[:-1])
-        dirs = [base_dir+'_'+ '{:04g}'.format(idx+1) for idx in range(divide_w*divide_h)]
+        base_dir = '/'.join(src.split('/')[:-1])  # ./input
+        output_base_dir = base_dir + '-' + str(divide_w) + '_' + str(divide_h)  # ./input-4_3
+        dirs = [output_base_dir + '/' + base_dir + '_' + '{:04g}'.format(idx+1) for idx in range(divide_w*divide_h)]
         for path in dirs:
             if not os.path.exists(path):
                 logger.debug('mkdir: ' + path)
