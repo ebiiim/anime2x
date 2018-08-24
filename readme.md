@@ -8,7 +8,57 @@
 2. `pip install -r requirements.txt`
 3. `/bin/`に`ffmpeg.exe`を置く（4.0.0確認済） [FFmpeg](https://ffmpeg.zeranoe.com/builds/)
 
-## Mode1: Single (single_dedup.py)
+## Mode1: Multi (run.py)
+
+環境にあわせて`run.py`を編集してから実行してください。コマンドラインオプションは気が向いたら実装します。
+
+`opencv-python`が必要です。
+Windowsでpipがうまく動かない場合は[こちら](https://www.lfd.uci.edu/~gohlke/pythonlibs/#opencv)のコンパイル済みバイナリを利用してください。
+OpenCV自体のインストールは不要です。
+
+確認済: `opencv_python‑3.4.2‑cp37‑cp37m‑win_amd64.whl`
+
+### Workflow (Example)
+
+1: `./input`を用意
+
+```
+input/
+  images_00000001.png
+  images_00000002.png
+  ...
+```
+
+2: 4x3分割 (`DIVIDE_W=4` `DIVIDE_W=3`)
+
+`d.MovDivider.divide_images(SRC_DIR, DIVIDE_W, DIVIDE_H)`
+
+```
+input-4_3/
+  input_0001/
+    images_00000001.png
+    images_00000002.png
+    ...
+  input_0002/
+    images_00000001.png
+    images_00000002.png
+    ...
+  ...
+```
+
+3: 結合
+
+`c.MovCombiner.combine_images(SRC_DIR, DIVIDE_W, DIVIDE_H)`
+
+```
+input-4_3-combined/
+  images_00000001.png
+  images_00000002.png
+  ...
+```
+
+
+## Mode2: Single (single_dedup.py)
 ### Usage
 
 5種類のコマンド `hist` `check` `copy1` `copy2` `enc`
