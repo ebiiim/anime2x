@@ -53,3 +53,5 @@ class MovDivider(object):
         img_list = [src_dir + '/' + each for each in os.listdir(src_dir)]
         for img in img_list:
             MovDivider.divide_image(img, dst_dirs, divide_w, divide_h)
+
+        return dst_dirs

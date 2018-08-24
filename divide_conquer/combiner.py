@@ -58,3 +58,5 @@ class MovCombiner(object):
 
         for img in os.listdir(src_dir):
             MovCombiner.combine_image(img, src_dirs, dst_dir, divide_w, divide_h)
+
+        return dst_dir
