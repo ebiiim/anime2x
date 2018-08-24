@@ -6,9 +6,6 @@ logger = getLogger(__name__)
 
 class MovDivider(object):
 
-    def __init__(self):
-        pass
-
     @staticmethod
     def mkdir4divider(src, divide_w, divide_h):
         """
@@ -19,7 +16,7 @@ class MovDivider(object):
         dirs = [output_base_dir + '/' + base_dir + '_' + '{:04g}'.format(idx+1) for idx in range(divide_w*divide_h)]
         for path in dirs:
             if not os.path.exists(path):
-                logger.debug('mkdir: ' + path)
+                logger.info('mkdir: ' + path)
                 os.makedirs(path)
 
         return dirs
@@ -49,9 +46,9 @@ class MovDivider(object):
         return [cv2.imwrite(s, im[b[1]:b[3], b[0]:b[2]]) for b, s in divide_list]
 
     @staticmethod
-    def devide_images(src_dir, divide_w, divide_h):
+    def divide_images(src_dir, divide_w, divide_h):
         dst_dirs = MovDivider.mkdir4divider(src_dir+'/dummy.data', divide_w, divide_h)
-        logger.debug('dst_dirs:' + str(dst_dirs))
+        logger.info('dst_dirs: ' + str(dst_dirs))
 
         img_list = [src_dir + '/' + each for each in os.listdir(src_dir)]
         for img in img_list:
