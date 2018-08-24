@@ -37,11 +37,12 @@ class MovDeDup(object):
                 logger.critical('not found:' + path)
                 sys.exit(1)
 
-    def ssim_hist_gen(self, df: pd.DataFrame, target_col_name, bins=1000, min_ssim=0.90, max_ssim=1.0, cumulative=True):
+    def ssim_hist_gen(self, df: pd.DataFrame, target_col_name, bins=1000,
+                      range_min=0.90, range_max=1.0, cumulative=True):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
-        df[target_col_name].hist(ax=ax, bins=bins, range=[min_ssim, max_ssim], cumulative=cumulative)
-        ax.set_xlabel('SSIM')
+        df[target_col_name].hist(ax=ax, bins=bins, range=[range_min, range_max], cumulative=cumulative)
+        ax.set_xlabel(target_col_name)
         ax.set_ylabel('Freq.')
         ax.xaxis.set_major_formatter(plt.FormatStrFormatter('%.4g'))
         # ax.set_title('Similarity')
@@ -58,20 +59,20 @@ class MovDeDup(object):
         return df
 
     @staticmethod
-    def get_copy_lists(df: pd.DataFrame, target_col_name, ssim_threshold):
+    def get_copy_lists(df: pd.DataFrame, target_col_name, threshold):
         """
         (src_list, del_list)を返す。
-        del_listはSSIMしきい値以上のファイル名を格納したリスト。
+        del_listは閾値以上のファイル名を格納したリスト。
         src_listはdel_listの1個前のファイル名を格納したリスト。
         利用方法: del_listのファイルを削除して、src_listのファイルをdel_listの同indexのファイル名で保存する。
         """
         col_filename = 'FileName'
 
         # 重複フレームのindexを取得
-        copy_index_list = df[df[target_col_name] >= ssim_threshold].index
+        copy_index_list = df[df[target_col_name] >= threshold].index
 
         # 重複率の表示
-        logger.info('ssim_threshold: ' + str(ssim_threshold))
+        logger.info('ssim_threshold: ' + str(threshold))
         lo = len(df)
         lc = len(copy_index_list)
         logger.info('length_original: ' + str(lo))
@@ -85,7 +86,7 @@ class MovDeDup(object):
             # コピー元ファイル名リスト
             for n in range(each - 1):  # range(each)だと1枚目まで見に行く、2枚目開始なのでrange(each - 1)
                 # n枚前が重複でない場合は採用（重複なら飛ばす）
-                if list(df.query('index == ' + str(each - n))[target_col_name])[0] < ssim_threshold:
+                if list(df.query('index == ' + str(each - n))[target_col_name])[0] < threshold:
                     src_list.extend(list(df.query('index == ' + str(each - n))[col_filename]))
                     break
             # コピー先ファイル名リスト

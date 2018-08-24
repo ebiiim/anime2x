@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 import datetime
-from de_duplication import mov_dedup as m
+from de_duplication import dedup as dd
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -13,7 +13,7 @@ if __name__ == '__main__':
     LOG_FMT = "%(asctime)s - %(levelname)s - %(threadName)s - %(name)s - %(message)s"
     logging.basicConfig(format=LOG_FMT, level=LOG_LEVEL)
 
-    mdp = m.MovDeDup()
+    mdp = dd.MovDeDup()
     mdp.init_check()
 
     if len(sys.argv) < 3:
@@ -38,17 +38,17 @@ if __name__ == '__main__':
         mdp.ssim_hist_gen(data, ssim_col_name)
 
     if sys.argv[1] == 'check':
-        data = m.MovDeDup.load_similarity_csv(sys.argv[3])
-        m.MovDeDup.get_copy_lists(data, ssim_col_name, float(sys.argv[2]))
+        data = dd.MovDeDup.load_similarity_csv(sys.argv[3])
+        dd.MovDeDup.get_copy_lists(data, ssim_col_name, float(sys.argv[2]))
 
     if sys.argv[1] == 'copy1':
-        data = m.MovDeDup.load_similarity_csv(sys.argv[3])
-        del_l, src_l = m.MovDeDup.get_copy_lists(data, ssim_col_name, float(sys.argv[2]))
+        data = dd.MovDeDup.load_similarity_csv(sys.argv[3])
+        del_l, src_l = dd.MovDeDup.get_copy_lists(data, ssim_col_name, float(sys.argv[2]))
         mdp.copy_dedup(del_l)
 
     if sys.argv[1] == 'copy2':
-        data = m.MovDeDup.load_similarity_csv(sys.argv[3])
-        del_l, src_l = m.MovDeDup.get_copy_lists(data, ssim_col_name, float(sys.argv[2]))
+        data = dd.MovDeDup.load_similarity_csv(sys.argv[3])
+        del_l, src_l = dd.MovDeDup.get_copy_lists(data, ssim_col_name, float(sys.argv[2]))
         mdp.copy_dup(del_l, src_l)
 
     if sys.argv[1] == 'enc':
