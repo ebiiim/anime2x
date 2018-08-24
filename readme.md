@@ -8,8 +8,11 @@
 2. `pip install -r requirements.txt`
 3. `/bin/`に`ffmpeg.exe`を置く（4.0.0確認済） [FFmpeg](https://ffmpeg.zeranoe.com/builds/)
 
-## Mode1: Multi (run.py)
+## Mode1: Divided Images (run.py)
 
+画像を分割して重複排除を行う。
+
+### Usage
 環境にあわせて`run.py`を編集してから実行してください。コマンドラインオプションは気が向いたら実装します。
 
 `opencv-python`が必要です。
@@ -31,7 +34,7 @@ input/
 
 2: 4x3分割 (`DIVIDE_W=4` `DIVIDE_W=3`)
 
-`d.MovDivider.divide_images(SRC_DIR, DIVIDE_W, DIVIDE_H)`
+`d.MovDivider.divide_images()`
 
 ```
 input-4_3/
@@ -46,9 +49,11 @@ input-4_3/
   ...
 ```
 
-3: 結合
+3: (WIP) コピー
 
-`c.MovCombiner.combine_images(SRC_DIR, DIVIDE_W, DIVIDE_H)`
+4: 結合
+
+`c.MovCombiner.combine_images()`
 
 ```
 input-4_3-combined/
@@ -57,8 +62,17 @@ input-4_3-combined/
   ...
 ```
 
+5: エンコード
 
-## Mode2: Single (single_dedup.py)
+- `./output/`に`audio.aac`を置いとく
+- `FRAME_RATE`は`24`or`30`
+- 詳細は`run.py`参照
+- 特殊な場合は手動でFFmpegコマンドを実行して...
+
+## Mode2: Single Image (single_dedup.py)
+
+画像を分割せずに重複排除を行う。
+
 ### Usage
 
 5種類のコマンド `hist` `check` `copy1` `copy2` `enc`
