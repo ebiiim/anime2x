@@ -3,7 +3,6 @@ import subprocess
 import datetime
 from divide_conquer import divider as d
 from divide_conquer import combiner as c
-from de_duplication import dedup as dd
 from de_duplication import mdedup as mdd
 from logging import getLogger
 logger = getLogger(__name__)
@@ -13,7 +12,7 @@ if __name__ == '__main__':
 
     # ロギング設定
     LOG_FMT = "%(asctime)s - %(levelname)s - %(threadName)s - %(name)s - %(message)s"
-    LOG_LEVEL = logging.INFO
+    LOG_LEVEL = logging.DEBUG
 
     # 分割設定
     DIVIDE_W = 4
@@ -42,12 +41,10 @@ if __name__ == '__main__':
     # ひどすぎるパス処理
     copied_dirs_root_for_combiner = copied_dirs[0].split('/')[-3].replace('-'+str(DIVIDE_W)+'_'+str(DIVIDE_H), '')
     output_dir = c.MovCombiner.combine_images(copied_dirs_root_for_combiner, DIVIDE_W, DIVIDE_H)
-
-    output_dir = 'input-4_3-combined'
     # 5. エンコード
     if DO_ENCODE:
         path_ffmpeg = './bin/ffmpeg.exe'
-        path_tmp = './tmp'
+        path_tmp = './' + output_dir
         path_output = './output'
         encode_mp4 = [path_ffmpeg,
                       '-r ' + str(FRAME_RATE),
