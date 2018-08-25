@@ -17,17 +17,17 @@ if __name__ == '__main__':
     mdp.init_check()
 
     if len(sys.argv) < 3:
-        print('Usage: single_dedup.py CMD [SSIM_THRESHOLD] SIMILARITY_CSV_FILE\n'
+        print('Usage: single_dedup.py CMD [SIMILARITY_THRESHOLD] SIMILARITY_CSV_FILE\n'
               '\tCMD hist: Generate a histogram\n'
               '\tCMD check: Check duplicate images\n'
               '\tCMD copy1: Copy de-duplicated images to /tmp\n'
               '\tCMD copy2: Copy filtered images to /tmp\n'
               '\tCMD enc: Encode images in /tmp to a mp4 file\n'
-              'Example: single_dedup.py hist ./similarity.csv\n'
-              'Example: single_dedup.py check 0.85 ./similarity.csv\n'
-              'Example: single_dedup.py copy1 0.85 ./similarity.csv\n'
-              'Example: single_dedup.py copy2 0.85 ./similarity.csv\n'
-              'Example: single_dedup.py enc ./similarity.csv\n'
+              'Example: python single_dedup.py hist ./similarity.csv\n'
+              'Example: python single_dedup.py check 0.85 ./similarity.csv\n'
+              'Example: python single_dedup.py copy1 0.85 ./similarity.csv\n'
+              'Example: python single_dedup.py copy2 0.85 ./similarity.csv\n'
+              'Example: python single_dedup.py enc ./similarity.csv\n'
               )
         sys.exit(0)
 
