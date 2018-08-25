@@ -11,18 +11,20 @@ logger = getLogger(__name__)
 
 class MovDeDup(object):
 
-    def __init__(self, path_tmp='/tmp', path_input='/input', path_output='/output',
-                 path_bin='/bin', path_ffmpeg='/ffmpeg.exe'):
+    def __init__(self, path_tmp='tmp', path_input='input', path_output='output',
+                 path_bin='bin', path_ffmpeg='ffmpeg.exe'):
         # self.path_self = os.path.dirname(os.path.abspath(__file__))
-        self.path_self = '.'
+        self.path_self = './'
         self.path_tmp = self.path_self + path_tmp
         self.dir_input = path_input
         self.path_input = self.path_self + self.dir_input
         self.path_output = self.path_self + path_output
         self.path_bin = self.path_self + path_bin
-        self.path_ffmpeg = self.path_bin + path_ffmpeg
+        self.path_ffmpeg = self.path_bin + '/' +path_ffmpeg
         self._directories = [self.path_tmp, self.path_input, self.path_output, self.path_bin, ]
         self._binaries = [self.path_ffmpeg, ]
+        logger.debug('_directories: ' + str(self._directories))
+        logger.debug('_binaries: ' + str(self._binaries))
 
     def init_check(self, ):
         logger.debug('check dirs')
@@ -98,9 +100,13 @@ class MovDeDup(object):
         """
         input/のファイルをdel_listを除きすべてindex/からtmp/にコピーする。
         """
-        input_list = ['.' + self.dir_input + '/' + each for each in os.listdir(self.path_input)]
-        dedup_list = list(set(input_list) - set(del_list))
-        print(dedup_list)
+        input_dir = './' + self.dir_input + '/'
+        input_name_list = [each for each in os.listdir(self.path_input)]  # filenameだけ
+        del_name_list = [each.split('/')[-1] for each in del_list]  # filenameだけ
+        dedup_name_list = list(set(input_name_list) - set(del_name_list))
+        dedup_list = [input_dir + each for each in dedup_name_list]
+        logger.debug('dedup_list: '+ str(dedup_list))
+        logger.info('len(dedup_list): '+ str(len(dedup_list)))
         for file in dedup_list:
             copy_src = file
             copy_dst = self.path_tmp + '/' + file.split('/')[-1]

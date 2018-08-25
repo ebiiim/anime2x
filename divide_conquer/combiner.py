@@ -55,8 +55,9 @@ class MovCombiner(object):
 
         src_dirs, dst_dir = MovCombiner.mkdir4combiner(src_dir+'/dummy.data', divide_w, divide_h)
         logger.info('src_dirs: ' + str(src_dirs))
+        logger.info('dst_dir: ' + str(dst_dir))
 
-        for img in os.listdir(src_dir):
+        for img in os.listdir(src_dirs[0]):
             MovCombiner.combine_image(img, src_dirs, dst_dir, divide_w, divide_h)
 
         return dst_dir
