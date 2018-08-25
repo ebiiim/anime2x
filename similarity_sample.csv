@@ -1,4 +1,4 @@
-FrameID,FileName,SSIM(Whole)
+FrameID,FileName,SSIM
 2,./input/image_00000002.png,0.871203
 3,./input/image_00000003.png,0.999407
 4,./input/image_00000004.png,0.999903
