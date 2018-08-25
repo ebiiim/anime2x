@@ -49,20 +49,68 @@ input-4_3/
   ...
 ```
 
-3: (WIP) コピー
+3: 類似度ファイルを2:の出力先に置く
 
-4: 結合
+今のところファイル名は`psnr_XXXX.csv`で固定...
+
+```
+input-4_3/
+  input_0001/
+    images_00000001.png
+    images_00000002.png
+    ...
+  input_0002/
+    images_00000001.png
+    images_00000002.png
+    ...
+  ...
+  psnr_0001.csv
+  psnr_0002.csv
+  ...
+```
+
+
+
+
+4: コピー1
+
+`mdd.MultiDeDup.multi_copy1()`
+
+今のところ入力は`input*/`のみ、出力は`output*/`のみ対応...
+
+```
+output-4_3/
+  output_0001/
+    images_00000001.png
+    images_00000002.png
+    ...
+  output_0002/
+    images_00000001.png
+    images_00000002.png
+    ...
+  ...
+```
+
+5: 何かしらの処理を4:の出力に対して行うことができる
+
+6: コピー2
+
+`mdd.MultiDeDup.multi_copy2()`
+
+この処理は4:の出力フォルダ内で完結する
+
+7: 結合
 
 `c.MovCombiner.combine_images()`
 
 ```
-input-4_3-combined/
+output-4_3-combined/
   images_00000001.png
   images_00000002.png
   ...
 ```
 
-5: エンコード
+8: エンコード
 
 - `./output/`に`audio.aac`を置いとく
 - `FRAME_RATE`は`24`or`30`
@@ -79,11 +127,11 @@ input-4_3-combined/
 
 Examples
 
-- `single_dedup.py hist ./similarity.csv`: SSIM 0.90--1.00 の積み上げのヒストグラムを`output/`に出力する
-- `single_dedup.py check 0.85 ./similarity.csv`: `similarity.csv`の`SSIM(Whole)`で`0.85`以上の枚数や比率をコンソールに出力する
-- `single_dedup.py copy1 0.85 ./similarity.csv`: `input/`のうち重複しないフレーム（SSIM < `0.85`）だけを`tmp/`にコピーする
-- `single_dedup.py copy2 0.85 ./similarity.csv`: `input/`のうち重複するフレーム（SSIM > `0.85`）だけ、前の重複しないフレームを __`tmp/` から `tmp/` に__ コピーする
-- `single_dedup.py enc ./similarity.csv`: `tmp/`の中身をffmpegで動画に変換して`output/`に出力する（`output/audio.aac`を事前に置くこと）
+- `python single_dedup.py hist ./similarity.csv`: SSIM 0.90--1.00 の積み上げのヒストグラムを`output/`に出力する
+- `python single_dedup.py check 0.85 ./similarity.csv`: `similarity.csv`の`SSIM`で`0.85`以上の枚数や比率をコンソールに出力する
+- `python single_dedup.py copy1 0.85 ./similarity.csv`: `input/`のうち重複しないフレーム（SSIM < `0.85`）だけを`tmp/`にコピーする
+- `python single_dedup.py copy2 0.85 ./similarity.csv`: `input/`のうち重複するフレーム（SSIM > `0.85`）だけ、前の重複しないフレームを __`tmp/` から `tmp/` に__ コピーする
+- `python single_dedup.py enc ./similarity.csv`: `tmp/`の中身をffmpegで動画に変換して`output/`に出力する（`output/audio.aac`を事前に置くこと）
 
 `enc`はおまけ程度の機能しかない。`enc`では`./similarity.csv`は使わない（引数が2個あれば良い）。
 
