@@ -1,7 +1,10 @@
+import os
 import math
 import cv2
-import subprocess
+# import subprocess
 import numpy as np
+from logging import getLogger
+logger = getLogger(__name__)
 
 
 class CalcPSNR:
@@ -29,16 +32,20 @@ class CalcPSNR:
     def calc_psnr_frames(input_directory, output_file_name):
 
         # フレーム数の検出
-        cmd = 'ls ' + input_directory
-        out = subprocess.check_output(cmd.split()).decode('utf-8')
-        f_names = out.split()
+        # cmd = 'ls ' + input_directory
+        # out = subprocess.check_output(cmd.split()).decode('utf-8')
+        # f_names = out.split()
+
+        f_names = os.listdir(input_directory)
+        logger.debug('input: ' + input_directory + ', length: ' + str(len(f_names)))
+        logger.debug(f_names)
 
         csv_file = open(output_file_name, 'w')
         csv_file.write('FrameID,FileName,PSNR\n')
 
         file_name = input_directory + '/' + f_names[0]
         prev_frame = cv2.imread(file_name)
-        print(file_name)
+        logger.debug(file_name)
 
         for i in range(1, len(f_names)):
 
@@ -46,11 +53,11 @@ class CalcPSNR:
             now_frame = cv2.imread(file_name)
             if now_frame is None:
                 break
-            print(file_name)
+            logger.debug(file_name)
 
             psnr = CalcPSNR.calc_psnr(prev_frame, now_frame)
             csv_file.write(str(i+1) + ',' + file_name + ',' + str(psnr) + '\n')
 
             prev_frame = now_frame
 
-        return None
+        return output_file_name
