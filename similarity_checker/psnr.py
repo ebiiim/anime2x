@@ -45,15 +45,14 @@ class CalcPSNR:
 
         file_name = input_directory + '/' + f_names[0]
         prev_frame = cv2.imread(file_name)
-        logger.debug(file_name)
 
         for i in range(1, len(f_names)):
-
+            prev_file_name = file_name  # for logging
             file_name = input_directory + '/' + f_names[i]
             now_frame = cv2.imread(file_name)
             if now_frame is None:
                 break
-            logger.debug(file_name)
+            logger.debug('PSNR(' + prev_file_name + ', ' + file_name + ')')
 
             psnr = CalcPSNR.calc_psnr(prev_frame, now_frame)
             csv_file.write(str(i+1) + ',' + file_name + ',' + str(psnr) + '\n')
