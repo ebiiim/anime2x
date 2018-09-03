@@ -34,18 +34,22 @@ class CalcPSNR:
         f_names = out.split()
 
         csvFile = open(output_fileName, 'w')
-        csvFile.write('frame_ID,PSNR\n')
+        csvFile.write('FrameID,FileName,PSNR\n')
 
-        prev_frame = cv2.imread(input_directory + '/' + f_names[0])
+        fileName = input_directory + '/' + f_names[0]
+        prev_frame = cv2.imread(fileName)
+        print(fileName)
+
         for i in range(1, len(f_names)):
-            print(input_directory + '/' + f_names[i])
 
-            now_frame = cv2.imread(input_directory + '/' + f_names[i])
+            fileName = input_directory + '/' + f_names[i]
+            now_frame = cv2.imread(fileName)
             if now_frame is None:
                 break
+            print(fileName)
 
             psnr = CalcPSNR.calc_psnr(prev_frame, now_frame)
-            csvFile.write(str(i+1) + ',' + str(psnr) + '\n')
+            csvFile.write(str(i+1) + ',' + fileName + ',' + str(psnr) + '\n')
 
             prev_frame = now_frame
 
