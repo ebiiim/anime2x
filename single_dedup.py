@@ -31,24 +31,24 @@ if __name__ == '__main__':
               )
         sys.exit(0)
 
-    ssim_col_name = 'SSIM'
+    similarity_metrics_col_name = 'SSIM'
 
     if sys.argv[1] == 'hist':
         data = mdp.load_similarity_csv(sys.argv[2])
-        mdp.ssim_hist_gen(data, ssim_col_name)
+        mdp.hist_gen(data, similarity_metrics_col_name)
 
     if sys.argv[1] == 'check':
         data = dd.MovDeDup.load_similarity_csv(sys.argv[3])
-        dd.MovDeDup.get_copy_lists(data, ssim_col_name, float(sys.argv[2]))
+        dd.MovDeDup.get_copy_lists(data, similarity_metrics_col_name, float(sys.argv[2]))
 
     if sys.argv[1] == 'copy1':
         data = dd.MovDeDup.load_similarity_csv(sys.argv[3])
-        del_l, src_l = dd.MovDeDup.get_copy_lists(data, ssim_col_name, float(sys.argv[2]))
+        del_l, src_l = dd.MovDeDup.get_copy_lists(data, similarity_metrics_col_name, float(sys.argv[2]))
         mdp.copy_dedup(del_l)
 
     if sys.argv[1] == 'copy2':
         data = dd.MovDeDup.load_similarity_csv(sys.argv[3])
-        del_l, src_l = dd.MovDeDup.get_copy_lists(data, ssim_col_name, float(sys.argv[2]))
+        del_l, src_l = dd.MovDeDup.get_copy_lists(data, similarity_metrics_col_name, float(sys.argv[2]))
         mdp.copy_dup(del_l, src_l)
 
     if sys.argv[1] == 'enc':
