@@ -39,7 +39,7 @@ class MovDeDup(object):
                 logger.critical('not found:' + path)
                 sys.exit(1)
 
-    def ssim_hist_gen(self, df: pd.DataFrame, target_col_name, bins=1000,
+    def hist_gen(self, df: pd.DataFrame, target_col_name, bins=1000,
                       range_min=0.90, range_max=1.0, cumulative=True):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)

@@ -37,6 +37,7 @@ class CalcPSNR:
         # f_names = out.split()
 
         f_names = os.listdir(input_directory)
+        f_names.sort()
         logger.debug('input: ' + input_directory + ', length: ' + str(len(f_names)))
         logger.debug(f_names)
 
