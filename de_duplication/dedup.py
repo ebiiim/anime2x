@@ -40,7 +40,7 @@ class MovDeDup(object):
                 sys.exit(1)
 
     def hist_gen(self, df: pd.DataFrame, target_col_name, bins=1000,
-                      range_min=0.90, range_max=1.0, cumulative=True):
+                 range_min=0.90, range_max=1.0, cumulative=True):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         df[target_col_name].hist(ax=ax, bins=bins, range=[range_min, range_max], cumulative=cumulative)
@@ -74,7 +74,7 @@ class MovDeDup(object):
         copy_index_list = df[df[target_col_name] >= threshold].index
 
         # 重複率の表示
-        logger.info('ssim_threshold: ' + str(threshold))
+        logger.info('similarity_threshold: ' + str(threshold))
         lo = len(df)
         lc = len(copy_index_list)
         logger.info('length_original: ' + str(lo))
