@@ -11,13 +11,13 @@ class Waifu2xUpscaler(object):
                     model='models/upconv_7_photo',
                     scale_ratio=2, mode='noise_scale', noise_level=1,
                     # crop_w=None, crop_h=None,
-                    process='cudnn', crop_size=512,
+                    process='cudnn', crop_size=512, gpu_id=0,
                     tta_mode=0, waifu2x_path='./bin/waifu2x-caffe', waifu2x_exe='waifu2x-caffe-cui.exe'):
 
         cmd = ['"'+waifu2x_path+'/'+waifu2x_exe+'"',
                '-t '+str(tta_mode),
-               '--gpu '+str(0),
-               '-b ' + str(1),
+               '--gpu '+str(gpu_id),
+               '-b '+str(1),
                '-c '+str(crop_size),
                '-d '+str(output_depth),
                '-q '+str(-1),
@@ -29,7 +29,7 @@ class Waifu2xUpscaler(object):
                '-e '+output_ext,
                '-l '+input_ext,
                '-o '+output_dir,
-               '-i ' + input_dir,
+               '-i '+input_dir,
                ]
 
         # logging
