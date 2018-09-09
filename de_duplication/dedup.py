@@ -1,6 +1,6 @@
-import os
 import sys
 import shutil
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -13,14 +13,12 @@ class MovDeDup(object):
 
     def __init__(self, path_tmp='tmp', path_input='input', path_output='output',
                  path_bin='bin', path_ffmpeg='ffmpeg.exe'):
-        # self.path_self = os.path.dirname(os.path.abspath(__file__))
-        self.path_self = './'
-        self.path_tmp = self.path_self + path_tmp
-        self.dir_input = path_input
-        self.path_input = self.path_self + self.dir_input
-        self.path_output = self.path_self + path_output
-        self.path_bin = self.path_self + path_bin
-        self.path_ffmpeg = self.path_bin + '/' +path_ffmpeg
+        self.path_tmp = Path(path_tmp).resolve()
+        self.dir_input = Path(path_input).resolve()
+        self.path_input = Path(self.dir_input).resolve()
+        self.path_output = Path(path_output).resolve()
+        self.path_bin = Path(path_bin).resolve()
+        self.path_ffmpeg = (self.path_bin / path_ffmpeg).resolve()
         self._directories = [self.path_tmp, self.path_input, self.path_output, self.path_bin, ]
         self._binaries = [self.path_ffmpeg, ]
         logger.debug('_directories: ' + str(self._directories))
@@ -29,14 +27,14 @@ class MovDeDup(object):
     def init_check(self, ):
         logger.debug('check dirs')
         for path in self._directories:
-            if not os.path.exists(path):
-                logger.debug('mkdir: ' + path)
-                os.makedirs(path)
+            if not path.exists():
+                logger.debug('mkdir: ' + path.as_posix())
+                path.mkdir()
 
         logger.debug('check bins')
         for path in self._binaries:
-            if not os.path.exists(path):
-                logger.critical('not found:' + path)
+            if not path.exists():
+                logger.critical('not found:' + path.as_posix())
                 sys.exit(1)
 
     def hist_gen(self, df: pd.DataFrame, target_col_name, bins=1000,
@@ -50,7 +48,7 @@ class MovDeDup(object):
         # ax.set_title('Similarity')
         # plt.plot()
         # fig.show()
-        plt.savefig(self.path_output + '/' + datetime.datetime.now().strftime('%Y%m%d%H%M%SZ') + '.png')
+        plt.savefig(self.path_output.joinpath(datetime.datetime.now().strftime('%Y%m%d%H%M%SZ') + '.png'))
 
     @staticmethod
     def load_similarity_csv(similarity_csv) -> pd.DataFrame:
@@ -100,25 +98,24 @@ class MovDeDup(object):
         """
         input/のファイルをdel_listを除きすべてindex/からtmp/にコピーする。
         """
-        input_dir = './' + self.dir_input + '/'
-        input_name_list = [each for each in os.listdir(self.path_input)]  # filenameだけ
-        del_name_list = [each.split('/')[-1] for each in del_list]  # filenameだけ
+        input_name_list = [p.name for p in Path(self.dir_input).iterdir()]
+        del_name_list = [Path(p).name for p in del_list]
         dedup_name_list = list(set(input_name_list) - set(del_name_list))
-        dedup_list = [input_dir + each for each in dedup_name_list]
-        logger.debug('dedup_list: '+ str(dedup_list))
-        logger.info('len(dedup_list): '+ str(len(dedup_list)))
+        dedup_list = [self.dir_input.joinpath(f) for f in dedup_name_list]
+        logger.debug('dedup_list: ' + str(dedup_list))
+        logger.info('len(dedup_list): ' + str(len(dedup_list)))
         for file in dedup_list:
             copy_src = file
-            copy_dst = self.path_tmp + '/' + file.split('/')[-1]
+            copy_dst = self.path_tmp.joinpath(file.name)
             shutil.copy2(copy_src, copy_dst)
-            logger.debug('copy: ' + copy_src + ' -> ' + copy_dst)
+            logger.debug('copy: ' + copy_src.as_posix() + ' -> ' + copy_dst.as_posix())
 
     def copy_dup(self, dup_list, src_list):
         """
         input/のsrc_listに記載のファイルをdup_listに記載の名前でtmp/からtmp/にコピーする。
         """
         for (dup, src) in zip(dup_list, src_list):
-            copy_src = self.path_tmp + '/' + src.split('/')[-1]
-            copy_dst = self.path_tmp + '/' + dup.split('/')[-1]
+            copy_src = self.path_tmp / Path(src).name
+            copy_dst = self.path_tmp / Path(dup).name
             shutil.copy2(copy_src, copy_dst)
-            logger.debug('copy: ' + copy_src + ' -> ' + copy_dst)
+            logger.debug('copy: ' + copy_src.as_posix() + ' -> ' + copy_dst.as_posix())
