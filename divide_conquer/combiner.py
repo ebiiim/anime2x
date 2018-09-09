@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import sys
 import cv2
 from logging import getLogger
@@ -9,23 +9,22 @@ class MovCombiner(object):
 
     @staticmethod
     def mkdir4combiner(src, divide_w, divide_h):
-
-        base_dir = '/'.join(src.split('/')[:-1])  # ./input
-        base_dir_name = src.split('/')[-2]  # input
-        divided_base_dir = base_dir + '-' + str(divide_w) + '_' + str(divide_h)  # ./input-4_3
-        dst_dir = divided_base_dir + '-combined'  # ./input-4_3-combined
-        src_dirs = [divided_base_dir+'/'+base_dir_name+'_'+'{:04g}'.format(idx+1) for idx in range(divide_w*divide_h)]
+        src_dir = Path(src.replace('-' + str(divide_w) + '_' + str(divide_h), '')).resolve() # ./input
+        base_dir = src_dir.parent.joinpath(src_dir.name + '-' + str(divide_w) + '_' + str(divide_h)).resolve()
+        dst_dir = Path(base_dir.as_posix() + '-combined')  # ./input-4_3-combined
+        print(dst_dir)
+        src_dirs = [base_dir.joinpath(src_dir.name+'_'+'{:04g}'.format(idx+1)) for idx in range(divide_w*divide_h)]
 
         for path in src_dirs:
-            if not os.path.exists(path):
-                logger.critical('not found: ' + path)
+            if not path.exists():
+                logger.critical('not found: ' + path.as_posix())
                 sys.exit(-1)
 
-        if not os.path.exists(dst_dir):
-            logger.info('mkdir: ' + dst_dir)
-            os.makedirs(dst_dir)
+        if not dst_dir.exists():
+            logger.info('mkdir: ' + dst_dir.as_posix())
+            dst_dir.mkdir()
 
-        return src_dirs, dst_dir
+        return [p.as_posix() for p in src_dirs], dst_dir.as_posix()
 
     @staticmethod
     def combine_image(src_file, src_dirs, dst_dir, divide_w, divide_h):
@@ -37,7 +36,7 @@ class MovCombiner(object):
         for idx_h in range(divide_h):
             w_list = list()
             for idx_w in range(divide_w):
-                w_list.append(src_dirs[idx_dir] + '/' + src_file)
+                w_list.append(Path(src_dirs[idx_dir]).joinpath(src_file).as_posix())
                 idx_dir += 1
             concat_lists.append(w_list)
 
@@ -52,12 +51,11 @@ class MovCombiner(object):
 
     @staticmethod
     def combine_images(src_dir, divide_w, divide_h):
-
-        src_dirs, dst_dir = MovCombiner.mkdir4combiner(src_dir+'/dummy.data', divide_w, divide_h)
+        src_dirs, dst_dir = MovCombiner.mkdir4combiner(src_dir, divide_w, divide_h)
         logger.info('src_dirs: ' + str(src_dirs))
         logger.info('dst_dir: ' + str(dst_dir))
 
-        for img in os.listdir(src_dirs[0]):
-            MovCombiner.combine_image(img, src_dirs, dst_dir, divide_w, divide_h)
+        for img in Path(src_dirs[0]).iterdir():
+            MovCombiner.combine_image(img.name, src_dirs, dst_dir, divide_w, divide_h)
 
         return dst_dir
