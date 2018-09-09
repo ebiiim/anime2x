@@ -35,9 +35,7 @@ class CalcPSNR:
         logger.debug('input: ' + input_directory + ', length: ' + str(len(f_names)))
         logger.debug(f_names)
 
-        outfile = Path(output_file_name).resolve().as_posix()
-        csv_file = open(outfile, 'w')
-        csv_file.write('FrameID,FileName,PSNR\n')
+        results = ['FrameID,FileName,PSNR', ]
 
         file_name = f_names[0]
         prev_frame = cv2.imread(file_name)
@@ -51,8 +49,12 @@ class CalcPSNR:
             logger.debug('PSNR(' + prev_file_name + ', ' + file_name + ')')
 
             psnr = CalcPSNR.calc_psnr(prev_frame, now_frame)
-            csv_file.write(str(i+1) + ',' + file_name + ',' + str(psnr) + '\n')
+            results.append(str(i+1) + ',' + file_name + ',' + str(psnr))
 
             prev_frame = now_frame
+
+        outfile = Path(output_file_name).resolve().as_posix()
+        with open(outfile, 'w') as f:
+            f.write('\n'.join(results))
 
         return outfile
