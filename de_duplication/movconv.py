@@ -16,8 +16,8 @@ class MovieConverter(object):
         # informationからフレームレートを抽出する
         proc = subprocess.run([ffmpeg_path, '-i', src.as_posix()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = proc.stderr.decode("utf8")  # ffmpegはoutputを指定しなければエラーが出るため、stderrを見る
-        fps_loc = output.find('fps')
-        fps = float(output[fps_loc-16:fps_loc].split(',')[-1])  # fpsより前の16文字を持ってくる
+        fps_loc = output.find('fps')  # 文字列'fps'の位置
+        fps = float(output[fps_loc-16:fps_loc].split(',')[-1])  # 'fps'より前をカンマでsplitすると最後がフレームレート
 
         logger.info('FRAME RATE: ' + str(fps))
 
@@ -45,7 +45,7 @@ class MovieConverter(object):
         dst = Path(output_file).resolve()
         logger.info('VIDEO: '+video.as_posix())
         logger.info('AUDIO: '+audio.as_posix())
-        logger.info('MIXED: ' + dst.as_posix())
+        logger.info('MIXED: '+dst.as_posix())
 
         video_stream = ffmpeg.input(video.as_posix())
         audio_stream = ffmpeg.input(audio.as_posix())
@@ -65,7 +65,7 @@ class MovieConverter(object):
         logger.info('INPUT: '+src.as_posix())
         logger.info('OUTPUT: '+dst.as_posix())
         logger.info('NAME_FMT: '+pic_name.name)
-        logger.info('EXT: ' + ext)
+        logger.info('EXT: '+ext)
 
         (ffmpeg
          .input(src.as_posix())
@@ -86,7 +86,7 @@ class MovieConverter(object):
         logger.info('INPUT: '+src.as_posix())
         logger.info('OUTPUT: '+dst.as_posix())
         logger.info('NAME_FMT: '+pic_name.name)
-        logger.info('EXT: ' + input_ext)
+        logger.info('EXT: '+input_ext)
 
         (ffmpeg
          .input(pic_name.as_posix(), r=fps)
