@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import cv2
 from logging import getLogger
 logger = getLogger(__name__)
@@ -11,15 +11,14 @@ class MovDivider(object):
         """
         divide_image()のためにディレクトリを作成する
         """
-        base_dir = '/'.join(src.split('/')[:-1])  # ./input
-        output_base_dir = base_dir + '-' + str(divide_w) + '_' + str(divide_h)  # ./input-4_3
-        dirs = [output_base_dir + '/' + base_dir + '_' + '{:04g}'.format(idx+1) for idx in range(divide_w*divide_h)]
+        output_base_dir = src.parent.joinpath(src.name + '-' + str(divide_w) + '_' + str(divide_h)).resolve()
+        dirs = [output_base_dir.joinpath(src.name + '_' + '{:04g}'.format(idx+1)) for idx in range(divide_w*divide_h)]
         for path in dirs:
-            if not os.path.exists(path):
-                logger.info('mkdir: ' + path)
-                os.makedirs(path)
+            if not path.exists():
+                logger.info('mkdir: ' + path.as_posix())
+                path.mkdir()
 
-        return dirs
+        return [p.as_posix() for p in dirs]
 
     @staticmethod
     def divide_image(src, dst_dirs, divide_w, divide_h):
@@ -38,7 +37,7 @@ class MovDivider(object):
             for idx_w in range(divide_w):
                 box = (int(crop_w*idx_w), int(crop_h*idx_h), int(crop_w*(idx_w+1)), int(crop_h*(idx_h+1)))
                 # logger.debug(str(idx_dir) + ': ' + str(box))
-                save_path = dst_dirs[idx_dir] + '/' + file_name
+                save_path = Path(dst_dirs[idx_dir]).joinpath(file_name).as_posix()
                 divide_list.append((box, save_path))
                 idx_dir = idx_dir+1
 
@@ -47,10 +46,10 @@ class MovDivider(object):
 
     @staticmethod
     def divide_images(src_dir, divide_w, divide_h):
-        dst_dirs = MovDivider.mkdir4divider(src_dir+'/dummy.data', divide_w, divide_h)
+        dst_dirs = MovDivider.mkdir4divider(Path(src_dir), divide_w, divide_h)
         logger.info('dst_dirs: ' + str(dst_dirs))
 
-        img_list = [src_dir + '/' + each for each in os.listdir(src_dir)]
+        img_list = [p.resolve().as_posix() for p in Path(src_dir).iterdir()]
         for img in img_list:
             MovDivider.divide_image(img, dst_dirs, divide_w, divide_h)
 
