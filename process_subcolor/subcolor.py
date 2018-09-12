@@ -23,31 +23,30 @@ class SubtractiveColor:
     @staticmethod
     def quantize_uni(src, n_color):
         n_color_power = SubtractiveColor.is_power(n_color, 8)
-        assert n_color_power != 0, \
-            'quantize-number must be power of 8'''
+        assert n_color_power != 0, 'quantize-number must be power of 8'
         quantize_number = 256 // pow(2, n_color_power)
 
         dst = (src // quantize_number + 0.5) * quantize_number
         return dst
 
     @staticmethod
-    def kmeans_uni(src, K):
+    def kmeans_uni(src, k):
         # Clustering
         clustering_sample = np.float32(src.reshape(-1, 3))
         criteria = (cv2.TERM_CRITERIA_EPS +
                     cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
         ret, label, center = cv2.kmeans(
-            clustering_sample, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+            clustering_sample, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
         # Apply new color
         center = np.uint8(center)
-        dst = center[label.flatten()].reshape((src.shape))
+        dst = center[label.flatten()].reshape(src.shape)
         return dst
 
     @staticmethod
-    def kmeans_dir(input_dir, output_dir, K):
+    def kmeans_dir(input_dir, output_dir, k):
         # Accumulate pixels
-        src_names = list(Path(input_dir).glob('*.png'))
+        src_names = list(Path(input_dir).resolve().glob('*.png'))
         src_all_data = []
         src_all_shape = []
         for src_name in src_names:
@@ -61,7 +60,7 @@ class SubtractiveColor:
         criteria = (cv2.TERM_CRITERIA_EPS +
                     cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
         ret, label, center = cv2.kmeans(
-            clustering_sample, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+            clustering_sample, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
         # Apply new color
         id_src_all = 0
@@ -79,5 +78,7 @@ class SubtractiveColor:
                          ].reshape(src_all_shape[i])
 
             # Output dst
-            dst_name = Path(output_dir) / Path(src_names[i].name)
+            if not Path(output_dir).exists():
+                Path(output_dir).mkdir()
+            dst_name = Path(output_dir).resolve() / Path(src_names[i].name)
             cv2.imwrite(dst_name.as_posix(), dst)
