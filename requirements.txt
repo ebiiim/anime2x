@@ -1,4 +1,6 @@
 cycler==0.10.0
+ffmpeg-python==0.1.16
+future==0.16.0
 kiwisolver==1.0.1
 matplotlib==2.2.3
 numpy==1.15.0
