@@ -79,6 +79,7 @@ class MovieConverter(object):
     def pic2mov(input_dir, output_file, input_name='%08d', input_ext='png',
                 fps=24,  # input frame rate
                 vcodec='libx265', preset='slow', tune='ssim', crf='22',  # encoder settings
+                resize=False, resize_w=2560, resize_h=1440, resize_algo='lanczos',  # resize settings
                 ffmpeg_path=FFMPEG_PATH):
         src = Path(input_dir).resolve()
         dst = Path(output_file).parent.resolve().joinpath(Path(output_file).name)
@@ -88,10 +89,12 @@ class MovieConverter(object):
         logger.info('NAME_FMT: '+pic_name.name)
         logger.info('EXT: '+input_ext)
 
-        (ffmpeg
-         .input(pic_name.as_posix(), r=fps)
-         .output(dst.as_posix(), vcodec=vcodec, preset=preset, tune=tune, crf=crf)
-         .run(cmd=ffmpeg_path, overwrite_output=True)
-         )
+        stream = ffmpeg.input(pic_name.as_posix(), r=fps)
+        if resize:
+            stream = ffmpeg.output(stream, dst.as_posix(), vcodec=vcodec, preset=preset, tune=tune, crf=crf,
+                                   vf='scale='+str(resize_w)+'x'+str(resize_h)+':flags='+resize_algo)
+        else:
+            stream = ffmpeg.output(stream, dst.as_posix(), vcodec=vcodec, preset=preset, tune=tune, crf=crf)
+        stream.run(cmd=ffmpeg_path, overwrite_output=True)
 
         return dst.as_posix()
