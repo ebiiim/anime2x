@@ -81,7 +81,3 @@ class SubtractiveColor:
             # Output dst
             dst_name = Path(output_dir) / Path(src_names[i].name)
             cv2.imwrite(dst_name.as_posix(), dst)
-
-
-if __name__ == '__main__':
-    SubtractiveColor.kmeans_dir('./frames', './k-means', 5)
