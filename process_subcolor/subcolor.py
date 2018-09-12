@@ -64,22 +64,24 @@ class SubtractiveColor:
             clustering_sample, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
         # Apply new color
-
-        # TODO Real Process using K-NN
-        
         id_src_all = 0
         center = np.uint8(center)
         for i in range(len(src_names)):
-            dst_name = Path(output_dir + '/' + src_names[i].name)
+            # Extract pixels of source image from 'src_all_data,' which is accumulated samples
             dst_size = src_all_shape[i][0] * src_all_shape[i][1]
-            dst = np.uint8(src_all_data[id_src_all:(
-                id_src_all+dst_size)]).reshape(src_all_shape[i])
+            dst = np.uint8(src_all_data[id_src_all:(id_src_all+dst_size)])
             id_src_all += dst_size
+
+            # Match pixels to palette
+            bf = cv2.BFMatcher()
+            matches = bf.match(dst, center)
+            dst = center[[m.trainIdx for m in matches]
+                         ].reshape(src_all_shape[i])
+
+            # Output dst
+            dst_name = Path(output_dir) / Path(src_names[i].name)
             cv2.imwrite(dst_name.as_posix(), dst)
 
-if __name__ == '__main__':
-    dst = SubtractiveColor.kmeans_dir('./frames', './k-means', 5)
-    cv2.imwrite('./result.png', dst)
 
-    src_path = Path('./frames')
-    dst_path = Path('./quantize')
+if __name__ == '__main__':
+    SubtractiveColor.kmeans_dir('./frames', './k-means', 5)
