@@ -1,76 +1,63 @@
-import os
-import subprocess
-import datetime
-from divide_conquer import divider as d
-from divide_conquer import combiner as c
-from de_duplication import mdedup as mdd
+import time
+from pathlib import Path
+import shutil
+from divide_conquer.divider import MovDivider
+from divide_conquer.combiner import MovCombiner
+from de_duplication.mdedup import MultiDeDup
+from similarity_checker.psnr import CalcPSNR
+from de_duplication.movconv import MovieConverter
+from upscaling.waifu2x import Waifu2xUpscaler
 from logging import getLogger
 logger = getLogger(__name__)
 
+
+def run_all(input_file='input-movie.mp4', output_file='output-movie.mp4',
+            threshold=55, divide_w=4, divide_h=3, cleanup = True):
+    logger.info('Input/Output: '+input_file+' -> '+output_file)
+    logger.info('PSNR Threshold: '+str(threshold))
+    logger.info('divide(W, H): ('+str(divide_w)+', '+str(divide_h)+')')
+    start_time = time.time()
+
+    logger.info('start')
+    fps = MovieConverter.probe_file(input_file)
+    logger.info('extract audio')
+    sound_file = 'tmp-sound.mp4'
+    MovieConverter.extract_audio(input_file, sound_file)
+    logger.info('convert video to images')
+    tmp_dir = MovieConverter.mov2pic(input_file, 'tmp-input')
+    logger.info('divide images')
+    divided_dirs = MovDivider.divide_images(tmp_dir, divide_w, divide_h)
+    logger.info('calc PSNR')
+    for idx, each in enumerate(divided_dirs):
+        CalcPSNR.calc_psnr_frames(each, Path(each).parent.joinpath('psnr_' + '{:04g}'.format(idx + 1) + '.csv'))
+    logger.info('copy unique images')
+    copied_dirs = MultiDeDup.multi_copy1(divided_dirs, threshold)
+    logger.info('waifu2x')
+    for each in copied_dirs:
+        Waifu2xUpscaler.upscale_dir(each, each)
+    logger.info('copy duplicated images')
+    MultiDeDup.multi_copy2(divided_dirs, threshold)
+    logger.info('combine images')
+    copied_dir = Path(copied_dirs[0]).resolve().parent
+    combined_dir = MovCombiner.combine_images(copied_dir, divide_w, divide_h)
+    logger.info('convert images to video')
+    p2m_out = MovieConverter.pic2mov(input_dir=combined_dir, output_file='tmp-movie.mp4', fps=fps, preset='fast')
+    logger.info('mix audio and video')
+    MovieConverter.mix(p2m_out, sound_file, output_file)
+    if cleanup:
+        logger.info('cleanup')
+        for each in [sound_file, tmp_dir, Path(divided_dirs[0]).resolve().parent, copied_dir, p2m_out]:
+            shutil.rmtree(each)
+    logger.info('completed')
+
+    elapsed_time = time.time() - start_time
+    logger.info(time.strftime('elapsed time: %H:%M:%S', time.gmtime(elapsed_time)))
+
+
 if __name__ == '__main__':
     import logging
-
-    # ロギング設定
     LOG_FMT = "%(asctime)s - %(levelname)s - %(threadName)s - %(name)s - %(message)s"
-    LOG_LEVEL = logging.DEBUG
-
-    # 分割設定
-    DIVIDE_W = 4
-    DIVIDE_H = 3
-    SRC_DIR = './input'  # './hoge' のみ対応（'./hoge/hogehoge' などは途中でエラーが出ますorz）
-
-    # コピー設定
-    # METRICS = 'PSNR'  # (未使用) 'PSNR' or 'SSIM' or ...
-    THRESHOLD = 55
-
-    # エンコード設定
-    DO_ENCODE = True
-    DST_DIR = './output'  # audio.aacをDST_DIRに置いてください！
-    FRAME_RATE = 24
-
+    LOG_LEVEL = logging.INFO
     logging.basicConfig(format=LOG_FMT, level=LOG_LEVEL)
 
-    # 処理
-    # 1. 分割
-    divided_dirs = d.MovDivider.divide_images(SRC_DIR, DIVIDE_W, DIVIDE_H)
-    # 2. コピー1
-    mdd.MultiDeDup.multi_copy1(divided_dirs, THRESHOLD)  # similarity*.csvがあることを確認してください！
-    # 3. コピー2
-    copied_dirs = mdd.MultiDeDup.multi_copy2(divided_dirs, THRESHOLD)
-    # 4. 結合
-    # ひどすぎるパス処理
-    copied_dirs_root_for_combiner = copied_dirs[0].split('/')[-3].replace('-'+str(DIVIDE_W)+'_'+str(DIVIDE_H), '')
-    output_dir = c.MovCombiner.combine_images(copied_dirs_root_for_combiner, DIVIDE_W, DIVIDE_H)
-    # 5. エンコード
-    if DO_ENCODE:
-        path_ffmpeg = './bin/ffmpeg.exe'
-        path_tmp = './' + output_dir
-        path_output = './output'
-        encode_mp4 = [path_ffmpeg,
-                      '-r ' + str(FRAME_RATE),
-                      '-i ' + path_tmp + '/image_%8d.png',
-                      '-vcodec libx265 -preset fast -tune ssim -crf 22',
-                      path_output + '/tmp.mp4',
-                      ]
-
-        add_sound = [path_ffmpeg,
-                     '-i ' + path_output + '/tmp.mp4',
-                     '-i ' + path_output + '/audio.aac',
-                     '-vcodec copy',
-                     '-acodec copy',
-                     path_output + '/' + datetime.datetime.now().strftime('%Y%m%d%H%M%SZ') + '.mp4'
-                     ]
-
-        # logging
-        stdout = subprocess.DEVNULL
-        if logger.getEffectiveLevel() == 10:  # DEBUG
-            stdout = None
-
-        # run cmd
-        logger.debug(' '.join(encode_mp4))
-        subprocess.run(' '.join(encode_mp4), stdout=stdout)
-
-        logger.debug(' '.join(add_sound))
-        subprocess.run(' '.join(add_sound), stdout=stdout)
-
-        os.remove(path_output + '/tmp.mp4')
+    run_all(cleanup=False)
