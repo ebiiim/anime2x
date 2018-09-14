@@ -9,7 +9,7 @@ class MovCombiner(object):
 
     @staticmethod
     def mkdir4combiner(src, divide_w, divide_h):
-        src_dir = Path(src.replace('-' + str(divide_w) + '_' + str(divide_h), '')).resolve() # ./input
+        src_dir = Path(Path(src).as_posix().replace('-'+str(divide_w)+'_'+str(divide_h), '')).resolve() # ./input
         base_dir = src_dir.parent.joinpath(src_dir.name + '-' + str(divide_w) + '_' + str(divide_h)).resolve()
         dst_dir = Path(base_dir.as_posix() + '-combined')  # ./input-4_3-combined
         print(dst_dir)

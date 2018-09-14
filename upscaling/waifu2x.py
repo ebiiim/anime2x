@@ -39,7 +39,7 @@ class Waifu2xUpscaler(object):
             stdout = None
 
         # run cmd
-        logger.debug(' '.join(cmd))
+        logger.info(' '.join(cmd))
         subprocess.run(' '.join(cmd), stdout=stdout)
 
         return Path(output_dir).resolve().as_posix()

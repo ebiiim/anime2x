@@ -36,7 +36,7 @@ class MultiDeDup(object):
             mdp.init_check()
 
             data = MovDeDup.load_similarity_csv(sf)
-            del_l, src_l = MovDeDup.get_copy_lists(data, 'SSIM', tv)
+            del_l, src_l = MovDeDup.get_copy_lists(data, 'PSNR', tv)
             logger.debug('del_list: ' + str(del_l))
             logger.debug('src_list: ' + str(src_l))
             logger.info('len(del_list): ' + str(len(del_l)))
@@ -54,7 +54,7 @@ class MultiDeDup(object):
             mdp.init_check()
 
             data = MovDeDup.load_similarity_csv(sf)
-            del_l, src_l = MovDeDup.get_copy_lists(data, 'SSIM', tv)
+            del_l, src_l = MovDeDup.get_copy_lists(data, 'PSNR', tv)
             mdp.copy_dup(del_l, src_l)
 
         return dst_dirs

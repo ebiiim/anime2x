@@ -13,6 +13,9 @@ class MovDivider(object):
         """
         output_base_dir = src.parent.joinpath(src.name + '-' + str(divide_w) + '_' + str(divide_h)).resolve()
         dirs = [output_base_dir.joinpath(src.name + '_' + '{:04g}'.format(idx+1)) for idx in range(divide_w*divide_h)]
+        if not output_base_dir.exists():
+            logger.info('mkdir: ' + output_base_dir.as_posix())
+            output_base_dir.mkdir()
         for path in dirs:
             if not path.exists():
                 logger.info('mkdir: ' + path.as_posix())
