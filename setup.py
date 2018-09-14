@@ -46,24 +46,36 @@ def download_dependencies():
     bin_base_dir = bin_base_dir.resolve().as_posix()
 
     # ffmpeg
-    path_ffm_z = download_url(URL_FFM['402'], bin_base_dir, content=True)
-    path_ffm = Path(path_ffm_z).parent.joinpath(Path(path_ffm_z).stem)
-    path_ffm_exe = path_ffm.joinpath('bin/ffmpeg.exe')
-    with ZipFile(path_ffm_z) as zip_:
-        zip_.extractall(bin_base_dir)
-    shutil.copy2(path_ffm_exe.as_posix(), Path(bin_base_dir).joinpath('ffmpeg.exe'))
-    shutil.rmtree(path_ffm.as_posix())
-    os.remove(path_ffm_z.as_posix())
+    path_ffm = Path(bin_base_dir).joinpath('ffmpeg.exe')
+    if not path_ffm.exists():
+        path_ffm_z = download_url(URL_FFM['402'], bin_base_dir, content=True)
+        path_ffm_dir = Path(path_ffm_z).parent.joinpath(Path(path_ffm_z).stem)
+        path_ffm_exe = path_ffm_dir.joinpath('bin/ffmpeg.exe')
+        with ZipFile(path_ffm_z) as zip_:
+            zip_.extractall(bin_base_dir)
+        shutil.copy2(path_ffm_exe.as_posix(), path_ffm.as_posix())
+        shutil.rmtree(path_ffm_dir.as_posix())
+        os.remove(path_ffm_z.as_posix())
+    else:
+        logger.info('ffmpeg already exists: '+path_ffm.as_posix())
 
     # waifu2x-caffe
-    path_w2xc_z = download_url(URL_W2XC['1184'], bin_base_dir, content=True)
-    with ZipFile(path_w2xc_z) as zip_:
-        zip_.extractall(bin_base_dir)
-    os.remove(path_w2xc_z.as_posix())
+    path_w2xc = Path(bin_base_dir).joinpath('waifu2x-caffe')
+    if not path_w2xc.exists():
+        path_w2xc_z = download_url(URL_W2XC['1184'], bin_base_dir, content=True)
+        with ZipFile(path_w2xc_z.as_posix()) as zip_:
+            zip_.extractall(bin_base_dir)
+        os.remove(path_w2xc_z.as_posix())
+    else:
+        logger.info('waifu2-caffe already exists: '+path_w2xc.as_posix())
 
     # opencv-python binary
     url_cv = URL_CV['343_P3'+str(sys.version_info.minor)]
-    download_url(url_cv, '.', content=True)
+    cv_file = url_cv.split('/')[-1]
+    if not Path(cv_file).exists():
+        download_url(url_cv, '.', content=True)
+    else:
+        logger.info('opencv-python already exists: '+cv_file)
 
 
 if __name__ == '__main__':
