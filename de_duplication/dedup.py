@@ -1,6 +1,7 @@
 import sys
 import shutil
 from pathlib import Path
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -59,21 +60,29 @@ class MovDeDup(object):
         return df
 
     @staticmethod
-    def get_copy_lists(df: pd.DataFrame, target_col_name, threshold):
+    def get_copy_lists(similarity_file_path: str, threshold):
         """
-        (src_list, del_list)を返す。
+        similarityのcsvファイルを読み込んで、(src_list, del_list)を返す。
         del_listは閾値以上のファイル名を格納したリスト。
-        src_listはdel_listの1個前のファイル名を格納したリスト。
+        src_listはdel_listの1個前の重複しないファイルのファイル名を格納したリスト。
         利用方法: del_listのファイルを削除して、src_listのファイルをdel_listの同indexのファイル名で保存する。
+        CSVファイルのフォーマット: `FrameID,FileName,PSNR`, 1行目はヘッダ(データを格納しない)
         """
-        col_filename = 'FileName'
+        csv_ = []
+        with open(similarity_file_path, 'r') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                csv_.append(row)
+
+        # delete the header and cast `FrameID` and `PSNR` values
+        data = [[int(l[0]), l[1], float(l[2])] for l in csv_[1:]]
 
         # 重複フレームのindexを取得
-        copy_index_list = df[df[target_col_name] >= threshold].index
+        copy_index_list = [l[0] for l in data if l[2] >= threshold]
 
         # 重複率の表示
         logger.info('similarity_threshold: ' + str(threshold))
-        lo = len(df)
+        lo = len(data)
         lc = len(copy_index_list)
         logger.info('length_original: ' + str(lo))
         logger.info('length_copy: ' + str(lc))
@@ -84,14 +93,20 @@ class MovDeDup(object):
         del_list = list()
         for each in copy_index_list:
             # コピー元ファイル名リスト
-            for n in range(each - 1):  # range(each)だと1枚目まで見に行く、2枚目開始なのでrange(each - 1)
+            src_idx = each-1-1  # FrameID=2はdata[1]なのでoffsetが-1, デフォルトは1枚前を採用するのでさらに-1
+            for n in range(each):
                 # n枚前が重複でない場合は採用（重複なら飛ばす）
-                if list(df.query('index == ' + str(each - n))[target_col_name])[0] < threshold:
-                    src_list.extend(list(df.query('index == ' + str(each - n))[col_filename]))
+                if data[each-1-n][2] < threshold:
+                    src_idx = each-n-1
                     break
+            src_list.append(data[src_idx][1])
             # コピー先ファイル名リスト
-            del_list.extend(list(df.query('index == ' + str(each))[col_filename]))
+            del_list.append(data[each-1][1])
 
+        logger.debug('del_list: ' + str(del_list))
+        logger.debug('src_list: ' + str(src_list))
+        logger.info('len(del_list): ' + str(len(del_list)))
+        logger.info('len(src_list): ' + str(len(src_list)))
         return list(del_list), list(src_list)
 
     def copy_dedup(self, del_list):

@@ -35,13 +35,7 @@ class MultiDeDup(object):
             mdp = MovDeDup(path_input=src, path_tmp=dst, path_output=dst)
             mdp.init_check()
 
-            data = MovDeDup.load_similarity_csv(sf)
-            del_l, src_l = MovDeDup.get_copy_lists(data, 'PSNR', tv)
-            logger.debug('del_list: ' + str(del_l))
-            logger.debug('src_list: ' + str(src_l))
-            logger.info('len(del_list): ' + str(len(del_l)))
-            logger.info('len(src_list): ' + str(len(src_l)))
-
+            del_l, src_l = MovDeDup.get_copy_lists(sf, tv)
             mdp.copy_dedup(del_l)
 
         return dst_dirs
@@ -53,8 +47,7 @@ class MultiDeDup(object):
             mdp = MovDeDup(path_input=src, path_tmp=dst, path_output=dst)
             mdp.init_check()
 
-            data = MovDeDup.load_similarity_csv(sf)
-            del_l, src_l = MovDeDup.get_copy_lists(data, 'PSNR', tv)
+            del_l, src_l = MovDeDup.get_copy_lists(sf, tv)
             mdp.copy_dup(del_l, src_l)
 
         return dst_dirs
