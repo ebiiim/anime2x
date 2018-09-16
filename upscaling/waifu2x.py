@@ -12,7 +12,7 @@ class Waifu2xUpscaler(object):
                     model='models/upconv_7_photo',
                     scale_ratio=2, mode='noise_scale', noise_level=1,
                     # crop_w=None, crop_h=None,
-                    process='cudnn', crop_size=512, gpu_id=0,
+                    process='cudnn', crop_size=128, gpu_id=0,
                     tta_mode=0, waifu2x_path='./bin/waifu2x-caffe', waifu2x_exe='waifu2x-caffe-cui.exe'):
 
         cmd = ['"'+Path(waifu2x_path).joinpath(waifu2x_exe).resolve().as_posix()+'"',
