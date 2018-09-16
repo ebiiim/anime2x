@@ -35,7 +35,9 @@ class CalcPSNR:
         logger.debug('input: ' + input_directory + ', length: ' + str(len(f_names)))
         logger.debug(f_names)
 
-        results = ['FrameID,FileName,PSNR', ]
+        results = ['FrameID,FileName,PSNR',
+                   '1' + ',' + f_names[0] + ',' + '0.0',  # first frame
+                   ]
 
         file_name = f_names[0]
         prev_frame = cv2.imread(file_name)
