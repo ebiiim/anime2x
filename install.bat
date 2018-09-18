@@ -3,7 +3,7 @@ call "venv/Scripts/activate.bat"
 
 pip install requests
 
-python setup.py
+python download_dependencies.py
 
 SET TMP_PIP=tmp_pip.txt
 dir /b *.whl > %TMP_PIP%
