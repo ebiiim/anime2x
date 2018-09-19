@@ -12,7 +12,6 @@ class MovCombiner(object):
         src_dir = Path(Path(src).as_posix().replace('-'+str(divide_w)+'_'+str(divide_h), '')).resolve() # ./input
         base_dir = src_dir.parent.joinpath(src_dir.name + '-' + str(divide_w) + '_' + str(divide_h)).resolve()
         dst_dir = Path(base_dir.as_posix() + '-combined')  # ./input-4_3-combined
-        print(dst_dir)
         src_dirs = [base_dir.joinpath(src_dir.name+'_'+'{:04g}'.format(idx+1)) for idx in range(divide_w*divide_h)]
 
         for path in src_dirs:
