@@ -2,12 +2,10 @@
 
 block_cipher = None
 
-VERSION = '-0.3'
-
 a = Analysis(['run.py'],
              pathex=['.'],
              binaries=[],
-             datas=[('bin', 'bin')],
+             datas=[('bin', 'bin'), ('README.md', '.'), ('LICENSE', '.')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -34,4 +32,4 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=True,
-               name='anime2x'+VERSION)
+               name='anime2x')
