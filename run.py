@@ -94,7 +94,6 @@ def run_all(input_file, output_file, threshold, divide_w, divide_h, waifu2x_scal
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='0.3.0')
-    # print(args)
 
     import logging
     log_level = args['--log-level']
@@ -108,15 +107,6 @@ if __name__ == '__main__':
         log_level = logging.CRITICAL
     LOG_FMT = "%(asctime)s - %(levelname)s - %(threadName)s - %(name)s - %(message)s"
     logging.basicConfig(format=LOG_FMT, level=log_level)
-
-    # print('input_file', args['INPUT_FILE'], 'output_file', args['OUTPUT_FILE'],
-    #       'threshold',args['--threshold'],
-    #       'divide_w',args['--divide_x'], 'divide_h', args['--divide_y'],
-    #       'waifu2x_scale_ratio', args['--waifu2x_scale'], 'waifu2x_crop_size', args['--waifu2x_crop'],
-    #       'ffmpeg_vcodec', args['--ffmpeg_vcodec'], 'ffmpeg_preset', args['--ffmpeg_preset'],
-    #       'ffmpeg_tune', args['--ffmpeg_tune'], 'ffmpeg_crf', args ['--ffmpeg_crf'],
-    #       'ffmpeg_resize', args['--resize'], 'ffmpeg_resize_w', args['--resize_w'], 'ffmpeg_resize_h', args['--resize_h'],
-    #       'cleanup', not args['--no-cleanup'])
 
     run_all(input_file=args['INPUT_FILE'], output_file=args['OUTPUT_FILE'],
             threshold=args['--threshold'],
