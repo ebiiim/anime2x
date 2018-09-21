@@ -46,15 +46,14 @@ def download_dependencies():
     bin_base_dir = bin_base_dir.resolve().as_posix()
 
     # ffmpeg
-    path_ffm = Path(bin_base_dir).joinpath('ffmpeg.exe')
-    if not path_ffm.exists():
+    ffm_rpath = 'ffmpeg/bin/ffmpeg.exe'
+    if not Path(bin_base_dir).joinpath(ffm_rpath).exists():
         path_ffm_z = download_url(URL_FFM['402'], bin_base_dir, content=True)
         path_ffm_dir = Path(path_ffm_z).parent.joinpath(Path(path_ffm_z).stem)
-        path_ffm_exe = path_ffm_dir.joinpath('bin/ffmpeg.exe')
         with ZipFile(path_ffm_z) as zip_:
             zip_.extractall(bin_base_dir)
-        shutil.copy2(path_ffm_exe.as_posix(), path_ffm.as_posix())
-        shutil.rmtree(path_ffm_dir.as_posix())
+        path_ffm_dir.rename(Path(bin_base_dir).joinpath('ffmpeg'))
+        [os.remove(Path(bin_base_dir).joinpath(p).as_posix()) for p in ['ffmpeg/bin/ffprobe.exe', 'ffmpeg/bin/ffplay.exe']]
         os.remove(path_ffm_z.as_posix())
     else:
         logger.info('ffmpeg already exists: '+path_ffm.as_posix())

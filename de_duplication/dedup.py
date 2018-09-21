@@ -11,9 +11,11 @@ logger = getLogger(__name__)
 
 
 class MovDeDup(object):
+    # /path/to/project_root/bin/ffmpeg/bin/ffmpeg.exe
+    FFMPEG_PATH = Path(__file__+'/../../bin/ffmpeg/bin/ffmpeg.exe').resolve().as_posix()
 
     def __init__(self, path_tmp='tmp', path_input='input', path_output='output',
-                 path_bin='bin', path_ffmpeg='ffmpeg.exe'):
+                 path_bin='bin', path_ffmpeg=FFMPEG_PATH):
         self.path_tmp = Path(path_tmp).resolve()
         self.dir_input = Path(path_input).resolve()
         self.path_input = Path(self.dir_input).resolve()

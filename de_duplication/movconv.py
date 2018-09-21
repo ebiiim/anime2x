@@ -6,8 +6,8 @@ logger = getLogger(__name__)
 
 
 class MovieConverter(object):
-
-    FFMPEG_PATH = Path(__file__+'/../../bin/ffmpeg.exe').resolve().as_posix()  # /path/to/project_root/bin/ffmpeg.exe
+    # /path/to/project_root/bin/ffmpeg/bin/ffmpeg.exe
+    FFMPEG_PATH = Path(__file__+'/../../bin/ffmpeg/bin/ffmpeg.exe').resolve().as_posix()
 
     @staticmethod
     def probe_file(input_file, ffmpeg_path=FFMPEG_PATH):
