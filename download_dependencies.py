@@ -47,7 +47,8 @@ def download_dependencies():
 
     # ffmpeg
     ffm_rpath = 'ffmpeg/bin/ffmpeg.exe'
-    if not Path(bin_base_dir).joinpath(ffm_rpath).exists():
+    path_ffm = Path(bin_base_dir).joinpath(ffm_rpath)
+    if not path_ffm.exists():
         path_ffm_z = download_url(URL_FFM['402'], bin_base_dir, content=True)
         path_ffm_dir = Path(path_ffm_z).parent.joinpath(Path(path_ffm_z).stem)
         with ZipFile(path_ffm_z) as zip_:
