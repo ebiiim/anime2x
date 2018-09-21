@@ -18,8 +18,8 @@ anime2x.exe input.mp4 output.mp4
 ## System Requirements
 
 - Windows (64 bit)
-- NVIDIA GPU with [Compute Capability 3.0](https://developer.nvidia.com/cuda-gpus)
-    - CUDA 9.x and cuDNN 7.x are recommended (for [waifu2x-caffe]((https://github.com/lltcggie/waifu2x-caffe))). 
+- NVIDIA GPU
+    - CUDA 9.x and cuDNN 7.x are recommended (for [waifu2x-caffe](https://github.com/lltcggie/waifu2x-caffe)). 
     - More than 3x slower on CPU.
 - SSD
     - Very slow on HDD.
