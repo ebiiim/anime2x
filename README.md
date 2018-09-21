@@ -56,7 +56,6 @@ MIT
 
 This project uses:
 - [lltcggie/waifu2x-caffe](https://github.com/lltcggie/waifu2x-caffe)
-- [OpenCV](https://opencv.org/)
 - [FFmpeg](https://www.ffmpeg.org/)
 
 ## Changelog
