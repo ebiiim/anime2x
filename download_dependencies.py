@@ -1,5 +1,4 @@
 import os
-import sys
 import shutil
 from zipfile import ZipFile
 from pathlib import Path
@@ -7,11 +6,6 @@ import requests
 from logging import getLogger
 logger = getLogger(__name__)
 
-URL_CV = {
-    '343_P35': 'https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/opencv_python-3.4.3-cp35-cp35m-win_amd64.whl',
-    '343_P36': 'https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/opencv_python-3.4.3-cp36-cp36m-win_amd64.whl',
-    '343_P37': 'https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/opencv_python-3.4.3-cp37-cp37m-win_amd64.whl',
-}
 URL_FFM = {
     '402': 'https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.0.2-win64-static.zip',
 }
@@ -68,14 +62,6 @@ def download_dependencies():
         os.remove(path_w2xc_z.as_posix())
     else:
         logger.info('waifu2-caffe already exists: '+path_w2xc.as_posix())
-
-    # opencv-python binary
-    url_cv = URL_CV['343_P3'+str(sys.version_info.minor)]
-    cv_file = url_cv.split('/')[-1]
-    if not Path(cv_file).exists():
-        download_url(url_cv, '.', content=True)
-    else:
-        logger.info('opencv-python already exists: '+cv_file)
 
 
 if __name__ == '__main__':
