@@ -1,6 +1,8 @@
 # anime2x
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/nullpo-t/anime2x/blob/master/LICENSE) ![platform win-64](https://img.shields.io/badge/platform-win--64-lightgrey.svg)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/nullpo-t/anime2x/blob/master/LICENSE)
+![platform win-64](https://img.shields.io/badge/platform-win--64-lightgrey.svg)
+[![Build status](https://ci.appveyor.com/api/projects/status/ktd0ibyydscft13h/branch/master?svg=true)](https://ci.appveyor.com/project/ebiiim/anime2x/branch/master)
 
 ## A Pre-rendered Super-resolution Video Up-converter with waifu2x
 
