@@ -54,7 +54,7 @@ pyinstaller pyinstaller.spec
 
 MIT
 
-This project uses:
+The following are called at runtime:
 - [lltcggie/waifu2x-caffe](https://github.com/lltcggie/waifu2x-caffe)
 - [FFmpeg](https://www.ffmpeg.org/)
 
