@@ -1,0 +1,31 @@
+branches:
+  only:
+  - master
+  - /dev-*/
+skip_tags: true
+image: Visual Studio 2017
+environment:
+  PYTHON: C:\\Python37-x64
+build_script:
+- cmd: >-
+    %PYTHON%\\python.exe -m venv venv
+
+    call venv/Scripts/activate
+
+    pip install -r requirements.txt
+
+    python download_dependencies.py
+
+    pyinstaller pyinstaller.spec
+artifacts:
+- path: dist/anime2x
+  name: anime2x
+deploy:
+- provider: GitHub
+  tag: v0.3.0
+  release: anime2x 0.3.0
+  auth_token:
+    secure: Kvq8YG4nRFR7pBt//r+O7J9mAu3aNTlKVF+KbOZDLOvY/53FBCv7tEfk5G/nfkJZ
+  artifact: anime2x
+  on:
+    branch: master
