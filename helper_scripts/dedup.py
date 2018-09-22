@@ -2,6 +2,10 @@ import sys
 import shutil
 from pathlib import Path
 import csv
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import datetime
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -35,6 +39,27 @@ class MovDeDup(object):
             if not path.exists():
                 logger.critical('not found:' + path.as_posix())
                 sys.exit(1)
+
+    def hist_gen(self, df: pd.DataFrame, target_col_name, bins=1000,
+                 range_min=0.90, range_max=1.0, cumulative=True):
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        df[target_col_name].hist(ax=ax, bins=bins, range=[range_min, range_max], cumulative=cumulative)
+        ax.set_xlabel(target_col_name)
+        ax.set_ylabel('Freq.')
+        ax.xaxis.set_major_formatter(plt.FormatStrFormatter('%.4g'))
+        # ax.set_title('Similarity')
+        # plt.plot()
+        # fig.show()
+        plt.savefig(self.path_output.joinpath(datetime.datetime.now().strftime('%Y%m%d%H%M%SZ') + '.png'))
+
+    @staticmethod
+    def load_similarity_csv(similarity_csv) -> pd.DataFrame:
+        df = pd.read_csv(similarity_csv, index_col=0)
+        logger.debug(df.head(3))
+        logger.debug(df.info())
+        logger.debug(df.describe())
+        return df
 
     @staticmethod
     def get_copy_lists(similarity_file_path: str, threshold):

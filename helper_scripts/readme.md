@@ -4,9 +4,7 @@
 
 ## Preparation
 
-1. Python3の環境を用意する
-2. `pip install -r requirements.txt`
-3. `/bin/`に`ffmpeg.exe`を置く（4.0.0確認済） [FFmpeg](https://ffmpeg.zeranoe.com/builds/)
+`de_duplication/dedup.py`と`helper_scripts/dedup.py`を入れ替える。
 
 ## Mode1: Divided Images (run.py)
 
