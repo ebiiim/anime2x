@@ -36,8 +36,6 @@ pip install -r requirements.txt
 python download_dependencies.py
 ```
 
-Installing [opencv-python](https://pypi.org/project/opencv-python/) can be complicated, so you can consider using [unofficial precompiled binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#opencv).
-
 ### Run
 
 ```

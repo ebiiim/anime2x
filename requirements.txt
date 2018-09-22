@@ -7,7 +7,7 @@ future==0.16.0
 idna==2.7
 macholib==1.11
 numpy==1.15.1
-opencv-python==3.4.3
+opencv-python==3.4.3.18
 pefile==2018.8.8
 PyInstaller==3.4
 pywin32-ctypes==0.2.0
