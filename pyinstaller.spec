@@ -2,10 +2,11 @@
 
 block_cipher = None
 
+
 a = Analysis(['run.py'],
              pathex=['.'],
-             binaries=[],
-             datas=[('bin', 'bin'), ('README.md', '.'), ('LICENSE', '.')],
+             binaries=[('bin', 'bin')],
+             datas=[('README.md', '.'), ('LICENSE', '.')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
