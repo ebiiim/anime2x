@@ -1,9 +1,12 @@
+from pathlib import Path
 import subprocess
 from logging import getLogger
 logger = getLogger(__name__)
 
 
 class Waifu2xUpscaler(object):
+    # /path/to/project_root/bin/waifu2x-caffe/
+    WAIFU2X_PATH = Path(__file__ + '/../../bin/waifu2x-caffe').resolve().as_posix()
 
     @staticmethod
     def upscale_dir(input_dir, output_dir,
@@ -11,10 +14,10 @@ class Waifu2xUpscaler(object):
                     model='models/upconv_7_photo',
                     scale_ratio=2, mode='noise_scale', noise_level=1,
                     # crop_w=None, crop_h=None,
-                    process='cudnn', crop_size=512, gpu_id=0,
-                    tta_mode=0, waifu2x_path='./bin/waifu2x-caffe', waifu2x_exe='waifu2x-caffe-cui.exe'):
+                    process='cudnn', crop_size=128, gpu_id=0,
+                    tta_mode=0, waifu2x_path=WAIFU2X_PATH, waifu2x_exe='waifu2x-caffe-cui.exe'):
 
-        cmd = ['"'+waifu2x_path+'/'+waifu2x_exe+'"',
+        cmd = ['"'+Path(waifu2x_path).joinpath(waifu2x_exe).resolve().as_posix()+'"',
                '-t '+str(tta_mode),
                '--gpu '+str(gpu_id),
                '-b '+str(1),
@@ -22,14 +25,14 @@ class Waifu2xUpscaler(object):
                '-d '+str(output_depth),
                '-q '+str(-1),
                '-p '+process,
-               '--model_dir '+'"'+waifu2x_path+'/'+model+'"',
+               '--model_dir '+Path(waifu2x_path).joinpath(model).resolve().as_posix(),
                '-s '+str(scale_ratio),
                '-n '+str(noise_level),
                '-m '+mode,
                '-e '+output_ext,
                '-l '+input_ext,
-               '-o '+output_dir,
-               '-i '+input_dir,
+               '-o '+Path(output_dir).resolve().as_posix(),
+               '-i '+Path(input_dir).resolve().as_posix(),
                ]
 
         # logging
@@ -38,7 +41,7 @@ class Waifu2xUpscaler(object):
             stdout = None
 
         # run cmd
-        logger.debug(' '.join(cmd))
+        logger.info(' '.join(cmd))
         subprocess.run(' '.join(cmd), stdout=stdout)
 
-        return output_dir
+        return Path(output_dir).resolve().as_posix()
