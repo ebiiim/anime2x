@@ -2,9 +2,9 @@
 Usage:
   anime2x.exe INPUT_FILE OUTPUT_FILE
               [--threshold=<psnr_value>] [--divide_x=<div_x>] [--divide_y=<div_y>]
-              [--waifu2x_scale=<scale>] [--waifu2x_crop=<crop>] [--ffmpeg_vcodec=<vcodec>]
-              [--ffmpeg_preset=<preset>] [--ffmpeg_tune=<tune>] [--ffmpeg_crf=<crf>]
-              [--resize --resize_w=<width> --resize_h=<height>]
+              [--waifu2x_scale=<scale>] [--waifu2x_crop=<crop>] [--waifu2x_nr=<nr>]
+              [--ffmpeg_vcodec=<vcodec>] [--ffmpeg_preset=<preset>] [--ffmpeg_tune=<tune>]
+              [--ffmpeg_crf=<crf>] [--resize --resize_w=<width> --resize_h=<height>]
               [--no-cleanup] [--log-level=<level>]
   anime2x.exe --help
   anime2x.exe --version
@@ -17,6 +17,7 @@ Arguments:
   --divide_y=<div_y>        Number of divisions on y axis [default: 6].
   --waifu2x_scale=<scale>   waifu2x-caffe scale ratio [default: 2].
   --waifu2x_crop=<crop>     waifu2x-caffe crop size [default: 128].
+  --waifu2x_nr=<nr>         waifu2x-caffe noise reduction level [default: 1].
   --ffmpeg_vcodec=<vcodec>  FFmpeg vcodec [default: libx265].
   --ffmpeg_preset=<preset>  FFmpeg preset [default: slow].
   --ffmpeg_tune=<tune>      FFmpeg tune [default: ssim].
@@ -47,7 +48,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 
-def run_all(input_file, output_file, threshold, divide_w, divide_h, waifu2x_scale_ratio, waifu2x_crop_size,
+def run_all(input_file, output_file, threshold, divide_w, divide_h, waifu2x_scale_ratio, waifu2x_crop_size, waifu2x_nr_value,
             ffmpeg_vcodec, ffmpeg_preset, ffmpeg_tune, ffmpeg_crf, ffmpeg_resize, ffmpeg_resize_w, ffmpeg_resize_h,
             cleanup):
     logger.info('Input/Output: '+input_file+' -> '+output_file)
@@ -71,7 +72,8 @@ def run_all(input_file, output_file, threshold, divide_w, divide_h, waifu2x_scal
     copied_dirs = MultiDeDup.multi_copy1(divided_dirs, int(threshold))
     logger.info('waifu2x')
     for each in copied_dirs:
-        Waifu2xUpscaler.upscale_dir(each, each, scale_ratio=int(waifu2x_scale_ratio), crop_size=int(waifu2x_crop_size))
+        Waifu2xUpscaler.upscale_dir(each, each, scale_ratio=int(waifu2x_scale_ratio), crop_size=int(waifu2x_crop_size),
+                                    noise_level=int(waifu2x_nr_value))
     logger.info('copy duplicated images')
     MultiDeDup.multi_copy2(divided_dirs, int(threshold))
     logger.info('combine images')
@@ -93,7 +95,7 @@ def run_all(input_file, output_file, threshold, divide_w, divide_h, waifu2x_scal
 
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version='0.3.0')
+    args = docopt(__doc__, version='0.4.0')
 
     import logging
     log_level = args['--log-level']
@@ -112,6 +114,7 @@ if __name__ == '__main__':
             threshold=args['--threshold'],
             divide_w=args['--divide_x'], divide_h=args['--divide_y'],
             waifu2x_scale_ratio=args['--waifu2x_scale'], waifu2x_crop_size=args['--waifu2x_crop'],
+            waifu2x_nr_value=args['--waifu2x_nr'],
             ffmpeg_vcodec=args['--ffmpeg_vcodec'], ffmpeg_preset=args['--ffmpeg_preset'],
             ffmpeg_tune=args['--ffmpeg_tune'], ffmpeg_crf=args['--ffmpeg_crf'],
             ffmpeg_resize=args['--resize'], ffmpeg_resize_w=args['--resize_w'], ffmpeg_resize_h=args['--resize_h'],

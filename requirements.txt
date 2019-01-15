@@ -11,5 +11,5 @@ opencv-python==3.4.3.18
 pefile==2018.8.8
 PyInstaller==3.4
 pywin32-ctypes==0.2.0
-requests==2.19.1
+requests==2.21.0
 urllib3==1.23
