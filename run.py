@@ -95,7 +95,7 @@ def run_all(input_file, output_file, threshold, divide_w, divide_h, waifu2x_scal
 
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version='0.3.0')
+    args = docopt(__doc__, version='0.4.0')
 
     import logging
     log_level = args['--log-level']

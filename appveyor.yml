@@ -5,7 +5,7 @@ branches:
 skip_tags: true
 image: Visual Studio 2017
 environment:
-  PYTHON: C:\\Python37-x64
+  PYTHON: C:\\Python37
 build_script:
 - cmd: >-
     %PYTHON%\\python.exe -m venv venv
@@ -22,8 +22,8 @@ artifacts:
   name: anime2x
 deploy:
 - provider: GitHub
-  tag: v0.3.0
-  release: anime2x 0.3.0
+  tag: v0.4.0
+  release: anime2x 0.4.0
   auth_token:
     secure: Kvq8YG4nRFR7pBt//r+O7J9mAu3aNTlKVF+KbOZDLOvY/53FBCv7tEfk5G/nfkJZ
   artifact: anime2x
