@@ -2,9 +2,9 @@
 Usage:
   anime2x.exe INPUT_FILE OUTPUT_FILE
               [--threshold=<psnr_value>] [--divide_x=<div_x>] [--divide_y=<div_y>]
-              [--waifu2x_scale=<scale>] [--waifu2x_crop=<crop>] [--ffmpeg_vcodec=<vcodec>]
-              [--ffmpeg_preset=<preset>] [--ffmpeg_tune=<tune>] [--ffmpeg_crf=<crf>]
-              [--resize --resize_w=<width> --resize_h=<height>]
+              [--waifu2x_scale=<scale>] [--waifu2x_crop=<crop>] [--waifu2x_nr=<nr>]
+              [--ffmpeg_vcodec=<vcodec>] [--ffmpeg_preset=<preset>] [--ffmpeg_tune=<tune>]
+              [--ffmpeg_crf=<crf>] [--resize --resize_w=<width> --resize_h=<height>]
               [--no-cleanup] [--log-level=<level>]
   anime2x.exe --help
   anime2x.exe --version
