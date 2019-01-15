@@ -64,8 +64,10 @@ The following are called at runtime:
 
 ### 0.4.0 / 2019-01-15
 
-- Add an option to decide waifu2x noise reduction level (#17).
-- Security update.
+- Add an option to decide waifu2x noise reduction level.
+- Security updates.
+
+Resolved: [#17](https://github.com/nullpo-t/anime2x/issues/17)
 
 ### 0.3.0 / 2018-09-22
 
