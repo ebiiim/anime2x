@@ -11,6 +11,8 @@ Since the program performs deduplication before upscaling, processing is faster 
 
 ## Usage
 
+Download: [v0.4.0](https://github.com/nullpo-t/anime2x/releases/download/v0.4.0/anime2x.zip)
+
 Convert `input.mp4` using default settings (2x upscaling).
 ```
 anime2x.exe input.mp4 output.mp4
@@ -60,6 +62,11 @@ The following are called at runtime:
 
 ## Changelog
 
+### 0.4.0 / 2019-01-15
+
+- Add an option to decide waifu2x noise reduction level (#17).
+- Security update.
+
 ### 0.3.0 / 2018-09-22
 
-Initial release.
+- Initial release.
